@@ -10,6 +10,7 @@
     saveExercise,
     applyNextWeight,
     moveExercise,
+    moveGroup,
     deleteExercise,
     deleteHistoryEntry,
     deleteGroup,
@@ -23,9 +24,11 @@
     storage: loadStorage(),
     openGroupMenuId: null,
     draggingExerciseId: null,
+    draggingGroupId: null,
     touchDrag: null,
     pendingTouchDrag: null,
     longPressTimer: null,
+    autoScrollFrame: null,
     historyPressTimer: null,
     historyPressTarget: null,
     suppressClickUntil: 0,
@@ -65,7 +68,7 @@
   });
 
   document.addEventListener("click", (event) => {
-    if (Date.now() < state.suppressClickUntil && event.target.closest(".exercise-card")) {
+    if (Date.now() < state.suppressClickUntil && event.target.closest(".exercise-card, .group-shell")) {
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -267,33 +270,37 @@
   });
 
   document.addEventListener("dragstart", (event) => {
-    const card = event.target.closest("[data-drag-exercise-id]");
-    if (!card) {
+    const source = getPointerDragSource(event);
+    if (!source) {
       return;
     }
 
-    state.draggingExerciseId = card.dataset.dragExerciseId;
+    if (source.type === "exercise") {
+      state.draggingExerciseId = source.id;
+    } else {
+      state.draggingGroupId = source.id;
+    }
+
     event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", state.draggingExerciseId);
-    card.classList.add("is-dragging");
+    event.dataTransfer.setData("text/plain", source.id);
+    event.dataTransfer.setData("application/x-gym-drag-type", source.type);
+    source.element.classList.add("is-dragging");
   });
 
   document.addEventListener("dragend", (event) => {
-    const card = event.target.closest("[data-drag-exercise-id]");
-    if (card) {
-      card.classList.remove("is-dragging");
-    }
-    document.querySelectorAll(".exercise-drop-section.is-over").forEach((section) => section.classList.remove("is-over"));
-    document.querySelectorAll(".exercise-card.is-drop-before").forEach((card) => card.classList.remove("is-drop-before"));
+    event.target.closest("[data-drag-exercise-id]")?.classList.remove("is-dragging");
+    event.target.closest("[data-drag-group-id]")?.classList.remove("is-dragging");
+    clearDropHighlights();
     state.draggingExerciseId = null;
+    state.draggingGroupId = null;
   });
 
   document.addEventListener("dragover", (event) => {
-    if (!state.draggingExerciseId) {
+    if (!state.draggingExerciseId && !state.draggingGroupId) {
       return;
     }
 
-    const placement = getDropPlacement(event.clientX, event.clientY);
+    const placement = getActiveDropPlacement(event.clientX, event.clientY);
     if (!placement) {
       return;
     }
@@ -304,62 +311,65 @@
   });
 
   document.addEventListener("dragleave", (event) => {
-    const dropSection = event.target.closest("[data-drop-section]");
-    if (!dropSection || (event.relatedTarget instanceof Node && dropSection.contains(event.relatedTarget))) {
+    const dropZone = event.target.closest("[data-drop-section], [data-group-list-parent], [data-drag-group-id]");
+    if (!dropZone || (event.relatedTarget instanceof Node && dropZone.contains(event.relatedTarget))) {
       return;
     }
 
-    dropSection.classList.remove("is-over");
+    clearDropHighlights();
   });
 
   document.addEventListener("drop", (event) => {
-    const placement = getDropPlacement(event.clientX, event.clientY);
+    const placement = getActiveDropPlacement(event.clientX, event.clientY);
     if (!placement) {
       return;
     }
 
     event.preventDefault();
-    const exerciseId = event.dataTransfer.getData("text/plain") || state.draggingExerciseId;
-    if (!exerciseId) {
-      return;
-    }
-
-    state.draggingExerciseId = null;
+    const type = event.dataTransfer.getData("application/x-gym-drag-type") || (state.draggingGroupId ? "group" : "exercise");
+    const id = event.dataTransfer.getData("text/plain") || state.draggingExerciseId || state.draggingGroupId;
     clearDropHighlights();
-    persist(moveExercise(state.storage, exerciseId, placement.groupId, placement.isSeparated, placement.beforeExerciseId));
+    state.draggingExerciseId = null;
+    state.draggingGroupId = null;
+    applyDrop(type, id, placement);
   });
 
   document.addEventListener("touchstart", (event) => {
-    const card = event.target.closest("[data-drag-exercise-id]");
-    if (!card || event.target.closest("button, input, select, textarea")) {
+    const source = getPointerDragSource(event);
+    if (!source) {
       return;
     }
 
     const touch = event.touches[0];
     clearLongPressTimer();
     const pending = {
-      exerciseId: card.dataset.dragExerciseId,
+      type: source.type,
+      id: source.id,
       startX: touch.clientX,
       startY: touch.clientY,
-      card,
+      element: source.element,
     };
     state.pendingTouchDrag = pending;
-    card.classList.add("is-touch-armed");
+    source.element.classList.add("is-touch-armed");
     state.longPressTimer = window.setTimeout(() => {
       if (state.pendingTouchDrag !== pending) {
         return;
       }
-      state.draggingExerciseId = pending.exerciseId;
+      if (pending.type === "exercise") {
+        state.draggingExerciseId = pending.id;
+      } else {
+        state.draggingGroupId = pending.id;
+      }
       state.touchDrag = {
         ...pending,
         x: pending.startX,
         y: pending.startY,
-        card,
       };
       state.suppressClickUntil = Date.now() + 900;
       document.body.classList.add("is-touch-drag-active");
-      card.classList.remove("is-touch-armed");
-      card.classList.add("is-touch-dragging");
+      pending.element.classList.remove("is-touch-armed");
+      pending.element.classList.add("is-touch-dragging");
+      scheduleTouchAutoScroll();
       if (navigator.vibrate) {
         navigator.vibrate(18);
       }
@@ -382,8 +392,8 @@
     event.preventDefault();
     state.touchDrag.x = touch.clientX;
     state.touchDrag.y = touch.clientY;
-    const placement = getDropPlacement(touch.clientX, touch.clientY);
-    highlightDropPlacement(placement);
+    highlightDropPlacement(getActiveDropPlacement(touch.clientX, touch.clientY));
+    scheduleTouchAutoScroll();
   }, { passive: false });
 
   document.addEventListener("touchend", () => {
@@ -392,13 +402,11 @@
       return;
     }
 
-    const { exerciseId, x, y } = state.touchDrag;
-    const placement = getDropPlacement(x, y);
+    const { type, id, x, y } = state.touchDrag;
+    const placement = getActiveDropPlacement(x, y);
     clearTouchDragState();
     state.suppressClickUntil = Date.now() + 900;
-    if (placement) {
-      persist(moveExercise(state.storage, exerciseId, placement.groupId, placement.isSeparated, placement.beforeExerciseId));
-    }
+    applyDrop(type, id, placement);
   });
 
   document.addEventListener("touchcancel", clearTouchDragState);
@@ -440,28 +448,119 @@
   document.addEventListener("pointerup", clearHistoryPressState);
   document.addEventListener("pointercancel", clearHistoryPressState);
 
-  function getDropPlacement(x, y) {
-    const element = document.elementFromPoint(x, y);
-    const dropSection = element?.closest("[data-drop-section]");
-    if (!dropSection) {
+  function getPointerDragSource(event) {
+    const target = event.target;
+    if (!(target instanceof HTMLElement) || target.closest("button, input, select, textarea")) {
       return null;
     }
 
-    const activeExerciseId = state.draggingExerciseId || state.touchDrag?.exerciseId;
-    const cards = [...dropSection.querySelectorAll("[data-drag-exercise-id]")]
-      .filter((card) => card.dataset.dragExerciseId !== activeExerciseId);
-    const beforeCard = cards.find((card) => {
-      const rect = card.getBoundingClientRect();
+    const exerciseCard = target.closest("[data-drag-exercise-id]");
+    if (exerciseCard) {
+      return {
+        type: "exercise",
+        id: exerciseCard.dataset.dragExerciseId,
+        element: exerciseCard,
+      };
+    }
+
+    const groupShell = target.closest("[data-drag-group-id]");
+    if (!groupShell) {
+      return null;
+    }
+
+    return {
+      type: "group",
+      id: groupShell.dataset.dragGroupId,
+      element: groupShell,
+    };
+  }
+
+  function getActiveDropPlacement(x, y) {
+    if (state.draggingGroupId || state.touchDrag?.type === "group") {
+      return getGroupDropPlacement(x, y);
+    }
+    return getExerciseDropPlacement(x, y);
+  }
+
+  function getExerciseDropPlacement(x, y) {
+    const element = document.elementFromPoint(x, y);
+    const dropSection = element?.closest("[data-drop-section]");
+    const activeExerciseId = state.draggingExerciseId || state.touchDrag?.id;
+    if (dropSection) {
+      const cards = [...dropSection.querySelectorAll("[data-drag-exercise-id]")]
+        .filter((card) => card.dataset.dragExerciseId !== activeExerciseId);
+      const beforeCard = cards.find((card) => {
+        const rect = card.getBoundingClientRect();
+        return y < rect.top + rect.height / 2;
+      });
+
+      return {
+        type: "exercise",
+        section: dropSection,
+        beforeCard,
+        beforeExerciseId: beforeCard?.dataset.dragExerciseId || null,
+        groupId: dropSection.dataset.dropGroupId,
+        isSeparated: dropSection.dataset.dropSection === "separated",
+      };
+    }
+
+    const groupShell = element?.closest("[data-drag-group-id]");
+    const groupId = groupShell?.dataset.dragGroupId;
+    if (!groupId) {
+      return null;
+    }
+
+    return {
+      type: "exercise",
+      groupShell,
+      groupId,
+      isSeparated: false,
+      beforeExerciseId: null,
+      beforeCard: null,
+    };
+  }
+
+  function getGroupDropPlacement(x, y) {
+    const element = document.elementFromPoint(x, y);
+    const activeGroupId = state.draggingGroupId || state.touchDrag?.id;
+    const container = element?.closest("[data-group-list-parent]");
+    if (!container || !activeGroupId) {
+      return null;
+    }
+
+    const targetParentId = container.dataset.groupListParent || null;
+    const descendants = new Set(collectGroupShellDescendantIds(activeGroupId));
+    if (targetParentId === activeGroupId || descendants.has(targetParentId)) {
+      return null;
+    }
+
+    const groupShells = [...container.children].filter(
+      (child) =>
+        child.matches?.("[data-drag-group-id]") &&
+        child.dataset.dragGroupId !== activeGroupId &&
+        !descendants.has(child.dataset.dragGroupId),
+    );
+    const beforeGroup = groupShells.find((shell) => {
+      const rect = shell.getBoundingClientRect();
       return y < rect.top + rect.height / 2;
     });
 
     return {
-      section: dropSection,
-      beforeCard,
-      beforeExerciseId: beforeCard?.dataset.dragExerciseId || null,
-      groupId: dropSection.dataset.dropGroupId,
-      isSeparated: dropSection.dataset.dropSection === "separated",
+      type: "group",
+      container,
+      targetParentId,
+      beforeGroup,
+      beforeGroupId: beforeGroup?.dataset.dragGroupId || null,
     };
+  }
+
+  function collectGroupShellDescendantIds(groupId) {
+    const group = findGroup(state.storage, groupId);
+    if (!group) {
+      return [];
+    }
+    const children = state.storage.groups.filter((item) => item.parentId === groupId);
+    return children.flatMap((child) => [child.id, ...collectGroupShellDescendantIds(child.id)]);
   }
 
   function highlightDropPlacement(placement) {
@@ -469,7 +568,21 @@
     if (!placement) {
       return;
     }
-    placement.section.classList.add("is-over");
+
+    if (placement.type === "group") {
+      placement.container.classList.add("is-over");
+      if (placement.beforeGroup) {
+        placement.beforeGroup.classList.add("is-group-drop-before");
+      }
+      return;
+    }
+
+    if (placement.section) {
+      placement.section.classList.add("is-over");
+    }
+    if (placement.groupShell) {
+      placement.groupShell.classList.add("is-exercise-drop-target");
+    }
     if (placement.beforeCard) {
       placement.beforeCard.classList.add("is-drop-before");
     }
@@ -477,7 +590,24 @@
 
   function clearDropHighlights() {
     document.querySelectorAll(".exercise-drop-section.is-over").forEach((section) => section.classList.remove("is-over"));
+    document.querySelectorAll(".child-group-list.is-over, .section-stack.is-over").forEach((section) => section.classList.remove("is-over"));
     document.querySelectorAll(".exercise-card.is-drop-before").forEach((card) => card.classList.remove("is-drop-before"));
+    document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-exercise-drop-target").forEach((group) => {
+      group.classList.remove("is-group-drop-before", "is-exercise-drop-target");
+    });
+  }
+
+  function applyDrop(type, id, placement) {
+    if (!id || !placement || placement.type !== type) {
+      return;
+    }
+
+    if (type === "group") {
+      persist(moveGroup(state.storage, id, placement.targetParentId, placement.beforeGroupId));
+      return;
+    }
+
+    persist(moveExercise(state.storage, id, placement.groupId, placement.isSeparated, placement.beforeExerciseId));
   }
 
   function clearLongPressTimer() {
@@ -489,14 +619,19 @@
 
   function clearTouchDragState() {
     clearLongPressTimer();
+    clearTouchAutoScroll();
     document.querySelectorAll(".exercise-card.is-touch-armed, .exercise-card.is-touch-dragging").forEach((card) => {
       card.classList.remove("is-touch-armed", "is-touch-dragging");
+    });
+    document.querySelectorAll(".group-shell.is-touch-armed, .group-shell.is-touch-dragging").forEach((group) => {
+      group.classList.remove("is-touch-armed", "is-touch-dragging");
     });
     document.body.classList.remove("is-touch-drag-active");
     clearDropHighlights();
     state.touchDrag = null;
     state.pendingTouchDrag = null;
     state.draggingExerciseId = null;
+    state.draggingGroupId = null;
   }
 
   function clearHistoryPressState() {
@@ -513,12 +648,49 @@
   }
 
   function autoScrollForTouch(y) {
-    const edge = 74;
-    const step = 18;
+    const edge = 92;
+    const maxStep = 18;
+    let delta = 0;
     if (y < edge) {
-      window.scrollBy({ top: -step, behavior: "auto" });
+      delta = -Math.max(6, Math.round(((edge - y) / edge) * maxStep));
     } else if (y > window.innerHeight - edge) {
-      window.scrollBy({ top: step, behavior: "auto" });
+      delta = Math.max(6, Math.round(((y - (window.innerHeight - edge)) / edge) * maxStep));
+    }
+
+    if (!delta) {
+      return false;
+    }
+
+    const scroller = document.scrollingElement || document.documentElement;
+    scroller.scrollTop += delta;
+    return true;
+  }
+
+  function scheduleTouchAutoScroll() {
+    if (state.autoScrollFrame || !state.touchDrag) {
+      return;
+    }
+
+    const tick = () => {
+      state.autoScrollFrame = null;
+      if (!state.touchDrag) {
+        return;
+      }
+
+      const didScroll = autoScrollForTouch(state.touchDrag.y);
+      highlightDropPlacement(getActiveDropPlacement(state.touchDrag.x, state.touchDrag.y));
+      if (didScroll) {
+        state.autoScrollFrame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    state.autoScrollFrame = window.requestAnimationFrame(tick);
+  }
+
+  function clearTouchAutoScroll() {
+    if (state.autoScrollFrame) {
+      window.cancelAnimationFrame(state.autoScrollFrame);
+      state.autoScrollFrame = null;
     }
   }
 

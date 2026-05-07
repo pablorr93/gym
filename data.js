@@ -410,6 +410,44 @@
     };
   }
 
+  function moveGroup(storage, groupId, targetParentId = null, beforeGroupId = null) {
+    const group = findGroup(storage, groupId);
+    if (!group) {
+      return storage;
+    }
+
+    const targetParent = targetParentId || null;
+    const oldParent = group.parentId || null;
+    const descendantIds = new Set(collectDescendantGroupIds(storage, groupId));
+    if (targetParent === groupId || descendantIds.has(targetParent)) {
+      return storage;
+    }
+
+    const sameParent = (item, parentId) => (item.parentId || null) === parentId;
+    const baseGroups = storage.groups.filter((item) => item.id !== groupId);
+    const moved = {
+      ...group,
+      parentId: targetParent,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const targetItems = baseGroups.filter((item) => sameParent(item, targetParent)).sort(byOrder);
+    const foundIndex = beforeGroupId ? targetItems.findIndex((item) => item.id === beforeGroupId) : -1;
+    const insertIndex = foundIndex >= 0 ? foundIndex : targetItems.length;
+    const orderedTarget = [...targetItems];
+    orderedTarget.splice(insertIndex, 0, moved);
+
+    const oldItems = oldParent === targetParent ? [] : baseGroups.filter((item) => sameParent(item, oldParent)).sort(byOrder);
+    const reordered = new Map();
+    oldItems.forEach((item, index) => reordered.set(item.id, { ...item, order: index }));
+    orderedTarget.forEach((item, index) => reordered.set(item.id, { ...item, order: index }));
+
+    return {
+      ...storage,
+      groups: storage.groups.map((item) => (reordered.has(item.id) ? reordered.get(item.id) : item)),
+    };
+  }
+
   function deleteExercise(storage, exerciseId) {
     return {
       ...storage,
@@ -546,6 +584,7 @@
     applyNextWeight,
     setExerciseSeparated,
     moveExercise,
+    moveGroup,
     deleteExercise,
     deleteHistoryEntry,
     deleteGroup,

@@ -1,4 +1,4 @@
-const CACHE_NAME = "gym-progress-v14";
+const CACHE_NAME = "gym-progress-v15";
 
 const APP_SHELL = [
   "./",

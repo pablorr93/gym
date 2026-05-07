@@ -61,7 +61,6 @@
             <span class="eyebrow">Gym Progress</span>
             <h1 class="sr-only">Rutina</h1>
             <img class="routine-logo" src="./assets/prr-header.png" alt="PRR" />
-            <p class="hero-copy user-name">Pablo</p>
           </div>
         </div>
         <article class="glass-card" style="--glow: rgba(139, 232, 78, 0.12);">
@@ -76,7 +75,7 @@
         </article>
       </section>
 
-      <section class="section-stack">
+      <section class="section-stack" data-group-list-parent="">
         ${roots.length ? roots.map((group) => renderGroupSection(state, group, 0)).join("") : renderEmptyState("Todavia no hay grupos en tu rutina.", "Usa el boton Anadir para crear el primer bloque muscular.")}
       </section>
     `;
@@ -169,7 +168,13 @@
     const total = activeExercises.reduce((sum, item) => sum + item.currentKg, 0);
 
     return `
-      <div class="group-shell" style="--depth: ${depth};">
+      <div
+        class="group-shell"
+        style="--depth: ${depth};"
+        draggable="true"
+        data-drag-group-id="${group.id}"
+        data-parent-group-id="${group.parentId || ""}"
+      >
         <article class="glass-card group-card" style="--glow: ${depth === 0 ? "rgba(139, 232, 78, 0.08)" : "rgba(255, 217, 92, 0.08)"};">
           <div class="card-body">
             <div
@@ -220,11 +225,11 @@
                       exercises.length
                         ? `
                           ${renderExerciseDropSection("En uso", group.id, "active", activeExercises)}
-                          ${renderExerciseDropSection("Apartados", group.id, "separated", separatedExercises)}
                         `
                         : ""
                     }
-                    <div class="child-group-list">${children.map((child) => renderGroupSection(state, child, depth + 1)).join("")}</div>
+                    <div class="child-group-list" data-group-list-parent="${group.id}">${children.map((child) => renderGroupSection(state, child, depth + 1)).join("")}</div>
+                    ${exercises.length ? renderExerciseDropSection("Apartados", group.id, "separated", separatedExercises) : ""}
                     ${!hasContent ? renderEmptyState("Todavia no hay ejercicios en este bloque.", "Puedes crear subgrupos o ejercicios desde aqui.") : ""}
                   </div>
                 `
