@@ -58,9 +58,10 @@
       <section class="hero routine-hero">
         <div>
           <div class="routine-lockup">
-          <span class="eyebrow">Gym Progress</span>
-          <h1 class="hero-title routine-title">Rutina</h1>
-          <p class="hero-copy user-name">Pablo</p>
+            <span class="eyebrow">Gym Progress</span>
+            <h1 class="sr-only">Rutina</h1>
+            <img class="routine-logo" src="./assets/prr-header.png" alt="PRR" />
+            <p class="hero-copy user-name">Pablo</p>
           </div>
         </div>
         <article class="glass-card" style="--glow: rgba(139, 232, 78, 0.12);">
