@@ -357,13 +357,14 @@
         card,
       };
       state.suppressClickUntil = Date.now() + 900;
+      document.body.classList.add("is-touch-drag-active");
       card.classList.remove("is-touch-armed");
       card.classList.add("is-touch-dragging");
       if (navigator.vibrate) {
         navigator.vibrate(18);
       }
     }, 500);
-  }, { passive: true });
+  }, { passive: false });
 
   document.addEventListener("touchmove", (event) => {
     const touch = event.touches[0];
@@ -383,7 +384,6 @@
     state.touchDrag.y = touch.clientY;
     const placement = getDropPlacement(touch.clientX, touch.clientY);
     highlightDropPlacement(placement);
-    autoScrollForTouch(touch.clientY);
   }, { passive: false });
 
   document.addEventListener("touchend", () => {
@@ -492,6 +492,7 @@
     document.querySelectorAll(".exercise-card.is-touch-armed, .exercise-card.is-touch-dragging").forEach((card) => {
       card.classList.remove("is-touch-armed", "is-touch-dragging");
     });
+    document.body.classList.remove("is-touch-drag-active");
     clearDropHighlights();
     state.touchDrag = null;
     state.pendingTouchDrag = null;

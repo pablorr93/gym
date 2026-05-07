@@ -1,4 +1,4 @@
-const CACHE_NAME = "gym-progress-v12";
+const CACHE_NAME = "gym-progress-v13";
 
 const APP_SHELL = [
   "./",
@@ -8,7 +8,6 @@ const APP_SHELL = [
   "./ui.js",
   "./app.js",
   "./manifest.webmanifest",
-  "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
 ];

@@ -356,6 +356,10 @@ code {
   transition: transform 180ms ease, opacity 180ms ease, background 180ms ease;
 }
 
+.fab {
+  transition: opacity 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
 .chip-button,
 .ghost-button,
 .primary-button,
@@ -408,7 +412,6 @@ code {
 .ghost-button:hover,
 .primary-button:hover,
 .danger-button:hover,
-.fab:hover,
 .nav-button:hover,
 .icon-button:hover,
 .option-button:hover,
@@ -416,6 +419,11 @@ code {
 .ready-toggle:hover,
 .group-menu-button:hover {
   transform: translateY(-1px);
+}
+
+.fab:hover,
+.fab:active {
+  transform: translateX(-50%);
 }
 
 @keyframes menuReveal {
@@ -478,6 +486,11 @@ code {
   user-select: none;
 }
 
+body.is-touch-drag-active {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .exercise-card.is-separated {
   opacity: 0.72;
 }
@@ -493,6 +506,7 @@ code {
 .exercise-card.is-touch-dragging {
   opacity: 0.52;
   transform: scale(0.99);
+  touch-action: none;
 }
 
 .exercise-card.is-drop-before {
@@ -1172,12 +1186,25 @@ body {
 }
 
 .bottom-nav {
-  width: min(calc(var(--mobile-frame-width) - 20px), calc(100% - 20px));
+  width: min(calc(var(--mobile-frame-width) - 54px), calc(100% - 54px));
+  gap: 6px;
+  padding: 7px;
+  border-radius: 24px;
 }
 
 .nav-button {
-  min-height: 58px;
-  padding-inline: 10px;
+  min-height: 48px;
+  padding: 7px 8px;
+  border-radius: 17px;
+}
+
+.nav-icon {
+  margin-bottom: 2px;
+  font-size: 1.08rem;
+}
+
+.nav-label {
+  font-size: 12px;
 }
 
 .hero-title {
@@ -1194,7 +1221,39 @@ body {
 }
 
 .modal {
-  width: min(calc(var(--mobile-frame-width) - 20px), calc(100% - 20px));
+  width: min(calc(var(--mobile-frame-width) - 32px), calc(100% - 32px));
+}
+
+.modal-content {
+  padding: 16px;
+}
+
+.modal-header {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  font-size: 1.55rem;
+}
+
+.modal .section-copy,
+.option-copy,
+.switch-copy {
+  font-size: 0.92rem;
+}
+
+.option-button {
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.option-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  font-size: 19px;
 }
 
 .section-stack,
