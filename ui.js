@@ -8,7 +8,6 @@
     entriesForExercise,
     findGroup,
     findExercise,
-    leafGroups,
     groupLabel,
     totalTrackedKg,
     readyExercisesCount,
@@ -632,7 +631,7 @@
 
   function renderExerciseModal(state) {
     const exercise = state.modal.exerciseId ? findExercise(state.storage, state.modal.exerciseId) : null;
-    const groups = leafGroups(state.storage);
+    const groups = exerciseTargetGroups(state.storage);
     const selectedGroupId = exercise?.groupId || state.modal.initialGroupId || "";
     const initialKg = exercise?.initialKg ?? exercise?.currentKg ?? "";
     const increment = exercise ? Math.max(0, Number(exercise.nextKg) - Number(exercise.currentKg)) : "";
@@ -641,7 +640,7 @@
       <div class="modal-header">
         <div>
           <h2 class="modal-title">${exercise ? "Editar ejercicio" : "Nuevo ejercicio"}</h2>
-          <p class="section-copy">${exercise ? "Ajusta pesos, notas y estado." : "Anade un nuevo ejercicio a uno de los grupos finales."}</p>
+          <p class="section-copy">${exercise ? "Ajusta pesos, notas y estado." : "Anade un nuevo ejercicio al grupo que toque."}</p>
         </div>
         <button class="icon-button" data-action="close-modal" aria-label="Cerrar modal">x</button>
       </div>
@@ -700,6 +699,14 @@
         </div>
       </form>
     `;
+  }
+
+  function exerciseTargetGroups(storage) {
+    function walk(groups) {
+      return groups.flatMap((group) => [group, ...walk(childGroups(storage, group.id))]);
+    }
+
+    return walk(rootGroups(storage));
   }
 
   function renderApplyNextModal(state) {

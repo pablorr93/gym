@@ -136,8 +136,19 @@
   }
 
   function groupLabel(storage, group) {
-    const parent = group.parentId ? findGroup(storage, group.parentId) : null;
-    return parent ? `${parent.name} / ${group.name}` : group.name;
+    const names = [group.name];
+    let current = group;
+
+    while (current.parentId) {
+      const parent = findGroup(storage, current.parentId);
+      if (!parent) {
+        break;
+      }
+      names.unshift(parent.name);
+      current = parent;
+    }
+
+    return names.join(" / ");
   }
 
   function totalTrackedKg(storage) {

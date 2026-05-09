@@ -640,7 +640,8 @@ body.is-touch-drag-active {
   margin: 0;
   flex: 1;
   min-width: 0;
-  font-size: 1.2rem;
+  font-size: 1.28rem;
+  line-height: 1.14;
 }
 
 .exercise-title-row {
@@ -654,9 +655,8 @@ body.is-touch-drag-active {
 .exercise-title-row .exercise-title {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .ready-toggle {
@@ -689,7 +689,7 @@ body.is-touch-drag-active {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 10px 0 0;
+  margin: 18px 0 -2px;
   min-width: 0;
 }
 
@@ -715,8 +715,14 @@ body.is-touch-drag-active {
 }
 
 .mini-badge.is-weight {
-  min-height: 28px;
-  padding: 5px 8px;
+  min-height: 34px;
+  padding: 7px 10px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--badge-color) 16%, rgba(9, 11, 13, 0.98)),
+    color-mix(in srgb, var(--badge-color) 8%, rgba(9, 11, 13, 0.98))
+  );
+  border-color: color-mix(in srgb, var(--badge-color) 18%, rgba(255, 255, 255, 0.08));
   font-size: 0.94rem;
   font-weight: 900;
 }
@@ -794,7 +800,7 @@ body.is-touch-drag-active {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .progress-track {
@@ -1508,12 +1514,19 @@ body {
 }
 
 .exercise-title {
-  font-size: 1rem;
+  font-size: 1.12rem;
+  line-height: 1.12;
 }
 
 .mini-badge {
   min-height: 32px;
   padding: 7px 10px;
+}
+
+.mini-badge.is-weight {
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 0.94rem;
 }
 
 .mini-badge.is-current {
