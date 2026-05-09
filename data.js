@@ -40,7 +40,7 @@
       { id: "e_triceps_cuerda", groupId: "g_triceps", name: "Triceps Cuerda", currentKg: 20, nextKg: 25, order: 0, updatedAt: now, notes: "", readyToIncrease: false },
       { id: "e_hombro_press", groupId: "g_hombros", name: "Press Hombro Maquina", currentKg: 22.5, nextKg: 25, order: 0, updatedAt: now, notes: "", readyToIncrease: false },
       { id: "e_gluteos_hip", groupId: "g_gluteos", name: "Hip Thrust", currentKg: 60, nextKg: 65, order: 0, updatedAt: now, notes: "", readyToIncrease: false },
-    ];
+    ].map((exercise) => ({ ...exercise, initialKg: exercise.currentKg }));
 
     const entries = exercises.map((exercise) => ({
       id: `log_${exercise.id}`,
@@ -74,16 +74,18 @@
       }
       const parsed = JSON.parse(raw);
       const rawEntries = Array.isArray(parsed.entries) ? parsed.entries : [];
+      const entries = rawEntries.filter(isStoredHistoryEntry);
+      const normalizedExercises = Array.isArray(parsed.exercises)
+        ? parsed.exercises.map((exercise) => normalizeExercise(exercise, entries))
+        : [];
       const normalized = {
         groups: Array.isArray(parsed.groups) ? parsed.groups : [],
-        exercises: Array.isArray(parsed.exercises) ? parsed.exercises.map(normalizeExercise) : [],
-        entries: rawEntries.filter(isStoredHistoryEntry),
+        exercises: normalizedExercises,
+        entries,
         snapshot: parsed.snapshot || { seedVersion: 1, createdAt: new Date().toISOString() },
       };
 
-      if (rawEntries.length !== normalized.entries.length) {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-      }
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
 
       return normalized;
     } catch (error) {
@@ -246,6 +248,7 @@
         groupId: payload.groupId,
         name: payload.name,
         notes: payload.notes,
+        initialKg: payload.initialKg,
         currentKg: payload.currentKg,
         nextKg: payload.nextKg,
         readyToIncrease: payload.readyToIncrease,
@@ -297,6 +300,7 @@
           groupId: payload.groupId,
           name: payload.name,
           notes: payload.notes,
+          initialKg: payload.initialKg,
           currentKg: payload.currentKg,
           nextKg: payload.nextKg,
           readyToIncrease: payload.readyToIncrease,
@@ -520,9 +524,17 @@
     return `${formatDate(value)} ${hours}:${minutes}`;
   }
 
-  function normalizeExercise(exercise) {
+  function normalizeExercise(exercise, entries = []) {
+    const initialFromHistory = entries.find(
+      (entry) => entry.exerciseId === exercise.id && entry.type === "createdExercise" && entry.toKg != null,
+    );
+    const initialKg = Number.isFinite(Number(exercise.initialKg))
+      ? Number(exercise.initialKg)
+      : Number(initialFromHistory?.toKg ?? exercise.currentKg ?? 0);
+
     return {
       ...exercise,
+      initialKg,
       isSeparated: Boolean(exercise.isSeparated),
     };
   }

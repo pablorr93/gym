@@ -244,7 +244,9 @@
 
   function renderExerciseCard(exercise) {
     const ready = exercise.readyToIncrease;
-    const progress = exercise.nextKg <= 0 ? 0 : clamp(exercise.currentKg / exercise.nextKg, 0, 1);
+    const gainedKg = Math.max(0, Number(exercise.currentKg || 0) - Number(exercise.initialKg ?? exercise.currentKg ?? 0));
+    const stepKg = Math.max(0, Number(exercise.nextKg || 0) - Number(exercise.currentKg || 0));
+    const progress = stepKg <= 0 ? 0 : clamp(gainedKg / (stepKg * 10), 0, 1);
 
     return `
       <article
@@ -261,7 +263,6 @@
             <div style="flex: 1;">
               <div class="exercise-title-row">
                 <h3 class="exercise-title">${escapeHtml(exercise.name)}</h3>
-                ${renderMiniBadge(formatKg(exercise.currentKg), "var(--accent)", "is-current")}
               </div>
             </div>
             <button
@@ -287,8 +288,17 @@
               data-exercise-id="${exercise.id}"
               style="--badge-color: var(--accent);"
               aria-label="Aplicar siguiente peso"
-            >${formatKgCompact(exercise.currentKg)}&nbsp; -> ${formatKgCompact(exercise.nextKg)} Kg</button>
-            ${renderMiniBadge(ready ? "Listo para subir" : "Aun en progreso", ready ? "var(--accent-warm)" : "var(--muted)")}
+            >${formatKg(exercise.currentKg)}&nbsp; -> ${formatKg(exercise.nextKg)}</button>
+            <button
+              class="status-weight-badge"
+              type="button"
+              data-action="toggle-ready"
+              data-exercise-id="${exercise.id}"
+              style="--status-weight-color: ${ready ? "var(--accent-warm)" : "var(--accent)"};"
+              aria-label="Cambiar estado de subida"
+            >
+              <span>${formatKg(exercise.currentKg)}</span>
+            </button>
           </div>
           ${
             exercise.notes
@@ -302,7 +312,7 @@
           }
           <div class="exercise-footer">
             <div class="progress-track" style="--value: ${progress};"><span></span></div>
-            <strong>${formatKg(exercise.currentKg)}</strong>
+            <strong class="progress-gain ${gainedKg === 0 ? "is-zero" : ""}">${formatSignedKg(gainedKg)}</strong>
           </div>
         </div>
       </article>
@@ -503,6 +513,10 @@
     return `<span class="mini-badge ${extraClass}" style="--badge-color: ${color};">${escapeHtml(label)}</span>`;
   }
 
+  function formatSignedKg(value) {
+    return `+ ${formatKgCompact(value)} Kg`;
+  }
+
   function renderEmptyState(title, copy) {
     return `
       <div class="empty-state">
@@ -620,6 +634,7 @@
     const exercise = state.modal.exerciseId ? findExercise(state.storage, state.modal.exerciseId) : null;
     const groups = leafGroups(state.storage);
     const selectedGroupId = exercise?.groupId || state.modal.initialGroupId || "";
+    const initialKg = exercise?.initialKg ?? exercise?.currentKg ?? "";
     const increment = exercise ? Math.max(0, Number(exercise.nextKg) - Number(exercise.currentKg)) : "";
 
     return `
@@ -646,6 +661,10 @@
         <div class="field">
           <label for="exercise-name">Nombre del ejercicio</label>
           <input id="exercise-name" name="name" type="text" value="${exercise ? escapeAttribute(exercise.name) : ""}" required />
+        </div>
+        <div class="field">
+          <label for="exercise-initial">Peso inicial (Kg)</label>
+          <input id="exercise-initial" name="initialKg" type="text" inputmode="decimal" value="${exercise ? escapeAttribute(formatKgCompact(initialKg)) : ""}" required />
         </div>
         <div class="form-row cols-2">
           <div class="field">

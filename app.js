@@ -205,12 +205,14 @@
         break;
       }
       case "exercise-editor": {
+        const initialKg = parseWeight(form.elements.initialKg.value);
         const currentKg = parseWeight(form.elements.currentKg.value);
         const nextIncrement = parseWeight(form.elements.nextKg.value);
         const payload = {
           id: state.modal.exerciseId || null,
           groupId: form.elements.groupId.value,
           name: form.elements.name.value.trim(),
+          initialKg,
           currentKg,
           nextKg: currentKg != null && nextIncrement != null ? currentKg + nextIncrement : null,
           notes: form.elements.notes.value.trim(),
@@ -225,8 +227,8 @@
           window.alert("Escribe un nombre para el ejercicio.");
           return;
         }
-        if (payload.currentKg == null || nextIncrement == null || payload.currentKg < 0 || nextIncrement < 0) {
-          window.alert("Introduce un peso actual y una subida validos.");
+        if (payload.initialKg == null || payload.currentKg == null || nextIncrement == null || payload.initialKg < 0 || payload.currentKg < 0 || nextIncrement < 0) {
+          window.alert("Introduce un peso inicial, peso actual y subida validos.");
           return;
         }
 
