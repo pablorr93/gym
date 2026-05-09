@@ -207,8 +207,8 @@
                     ? `
                       <div class="group-actions" role="menu">
                         <button class="chip-button" data-action="open-group-editor" data-group-id="${group.id}">Editar</button>
-                        <button class="chip-button" data-action="open-group-editor" data-parent-id="${group.id}">Subgrupo</button>
-                        <button class="chip-button" data-action="open-exercise-editor" data-group-id="${group.id}">Ejercicio</button>
+                        <button class="chip-button is-exercise-action" data-action="open-exercise-editor" data-group-id="${group.id}">Ejercicio</button>
+                        <button class="chip-button is-subgroup-action" data-action="open-group-editor" data-parent-id="${group.id}">Subgrupo</button>
                         <button class="danger-button" data-action="delete-group" data-group-id="${group.id}">Eliminar</button>
                       </div>
                     `
