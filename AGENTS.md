@@ -35,12 +35,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=43`
+  - `styles.css?v=46`
   - `data.js?v=34`
-  - `ui.js?v=39`
-  - `app.js?v=36`
+  - `ui.js?v=42`
+  - `app.js?v=39`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v46"`
+  - `CACHE_NAME = "gym-progress-v49"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -121,6 +121,11 @@ Tras cambios en JS/CSS:
 - El chip de subida de peso de cada ejercicio debe verse compacto pero con suficiente altura, un verde algo mas oscuro y colocado mas cerca de la barra de progreso.
 - La barra de progreso debe mantener el verde vivo original, con un efecto agresivo elegante: brillo controlado y un ligero corte de luz, sin parecer recargada.
 - En el menu de acciones de grupo, `Ejercicio` va antes de `Subgrupo` y usa verde oscuro; `Subgrupo` queda debajo y tambien usa verde, pero mas oscuro que `Ejercicio`.
+- La tarjeta superior ya no muestra el texto `Resumen de carga` ni el resumen de Kg activos; usa ese espacio para temporizadores grandes.
+- La tarjeta superior incluye solo cuatro temporizadores de descanso, por defecto `00:30`, `01:00`, `01:30` y `02:00`. No debe haber boton `+` ni temporizadores extra visibles.
+- Al pulsar un temporizador empieza a contar directamente; si se vuelve a pulsar mientras cuenta, se para y vuelve a mostrar su tiempo normal.
+- Al llegar a `00:00`, la pantalla hace un destello/parpadeo breve.
+- Al mantener pulsado un temporizador, se abre la edicion de ese temporizador. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
 
 ## Problemas que hubo antes con el preview
 

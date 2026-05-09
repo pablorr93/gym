@@ -18,10 +18,15 @@
     parseWeight,
   } = window.GymData;
 
+  const REST_TIMER_SLOTS_KEY = "gym_rest_timer_slots_v1";
+  const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
+  const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
+
   const state = {
     currentTab: "routine",
     modal: null,
     storage: loadStorage(),
+    restTimers: loadRestTimerSlots(),
     openGroupMenuId: null,
     draggingExerciseId: null,
     draggingGroupId: null,
@@ -31,11 +36,21 @@
     autoScrollFrame: null,
     historyPressTimer: null,
     historyPressTarget: null,
+    restTimerPressTimer: null,
+    restTimerPressTarget: null,
+    suppressTimerClickUntil: 0,
     suppressClickUntil: 0,
     modalHistoryActive: false,
+    restTimer: {
+      duration: 0,
+      remaining: 0,
+      endsAt: 0,
+      running: false,
+    },
   };
 
   const app = document.querySelector("#app");
+  let restTimerInterval = null;
 
   if (!window.history.state?.gymApp) {
     window.history.replaceState({ gymApp: true }, "", window.location.href);
@@ -73,6 +88,138 @@
 
   function confirmAction(message) {
     return window.confirm(message);
+  }
+
+  function loadRestTimerSlots() {
+    try {
+      window.localStorage.removeItem(OLD_REST_TIMERS_KEY);
+      const raw = window.localStorage.getItem(REST_TIMER_SLOTS_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return normalizeRestTimerSlots(parsed);
+    } catch (error) {
+      return DEFAULT_REST_TIMERS;
+    }
+  }
+
+  function saveRestTimerSlot(index, seconds) {
+    const nextTimers = [...state.restTimers];
+    nextTimers[index] = seconds;
+    state.restTimers = normalizeRestTimerSlots(nextTimers);
+    window.localStorage.setItem(REST_TIMER_SLOTS_KEY, JSON.stringify(state.restTimers));
+    render();
+  }
+
+  function normalizeRestTimerSlots(timers) {
+    const source = Array.isArray(timers) && timers.length ? timers : DEFAULT_REST_TIMERS;
+    return DEFAULT_REST_TIMERS.map((fallback, index) => {
+      const seconds = Math.floor(Number(source[index]) || 0);
+      return seconds > 0 && seconds <= 5999 ? seconds : fallback;
+    });
+  }
+
+  function parseTimerInput(value) {
+    const normalized = String(value || "").trim().replace(",", ":");
+    if (!normalized) {
+      return null;
+    }
+
+    if (normalized.includes(":")) {
+      const parts = normalized.split(":").map((part) => Number(part));
+      if (parts.length !== 2 || parts.some((part) => !Number.isFinite(part) || part < 0)) {
+        return null;
+      }
+      const [minutes, seconds] = parts;
+      if (seconds >= 60) {
+        return null;
+      }
+      return Math.floor(minutes * 60 + seconds);
+    }
+
+    const seconds = Number(normalized);
+    return Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : null;
+  }
+
+  function startRestTimer(seconds) {
+    const duration = Math.max(1, Math.floor(Number(seconds) || 0));
+    if (state.restTimer.running && state.restTimer.duration === duration) {
+      stopRestTimer();
+      return;
+    }
+
+    state.restTimer = {
+      duration,
+      remaining: duration,
+      endsAt: Date.now() + duration * 1000,
+      running: true,
+    };
+    ensureRestTimerInterval();
+    render();
+  }
+
+  function stopRestTimer() {
+    state.restTimer = {
+      duration: 0,
+      remaining: 0,
+      endsAt: 0,
+      running: false,
+    };
+    clearRestTimerInterval();
+    render();
+  }
+
+  function ensureRestTimerInterval() {
+    if (restTimerInterval) {
+      return;
+    }
+
+    restTimerInterval = window.setInterval(updateRestTimer, 250);
+  }
+
+  function updateRestTimer() {
+    if (!state.restTimer.running) {
+      clearRestTimerInterval();
+      return;
+    }
+
+    const remaining = Math.max(0, Math.ceil((state.restTimer.endsAt - Date.now()) / 1000));
+    if (remaining === state.restTimer.remaining) {
+      return;
+    }
+
+    state.restTimer.remaining = remaining;
+
+    if (remaining <= 0) {
+      state.restTimer.running = false;
+      clearRestTimerInterval();
+      triggerRestTimerComplete();
+    }
+
+    render();
+  }
+
+  function triggerRestTimerComplete() {
+    document.body.classList.remove("timer-complete-flash");
+    window.requestAnimationFrame(() => {
+      document.body.classList.add("timer-complete-flash");
+      window.setTimeout(() => document.body.classList.remove("timer-complete-flash"), 1500);
+    });
+  }
+
+  function clearRestTimerInterval() {
+    if (!restTimerInterval) {
+      return;
+    }
+
+    window.clearInterval(restTimerInterval);
+    restTimerInterval = null;
+  }
+
+  function clearRestTimerPressState() {
+    if (state.restTimerPressTimer) {
+      window.clearTimeout(state.restTimerPressTimer);
+      state.restTimerPressTimer = null;
+    }
+    state.restTimerPressTarget = null;
   }
 
   window.addEventListener("storage", (event) => {
@@ -138,6 +285,13 @@
         persist(applyNextWeight(state.storage, exercise.id, Number(exercise.nextKg) + increment));
         break;
       }
+      case "start-rest-timer":
+        event.stopPropagation();
+        if (Date.now() < state.suppressTimerClickUntil) {
+          return;
+        }
+        startRestTimer(actionEl.dataset.seconds);
+        break;
       case "open-quick-create":
         state.openGroupMenuId = null;
         openModal({ type: "quick-create" });
@@ -271,6 +425,17 @@
         closeModal();
         break;
       }
+      case "rest-timer-editor": {
+        const seconds = parseTimerInput(form.elements.timerValue.value);
+        const timerIndex = state.modal.timerIndex;
+        if (!seconds) {
+          window.alert("Escribe un tiempo valido, por ejemplo 00:45, 1:30 o 90.");
+          return;
+        }
+        closeModal();
+        saveRestTimerSlot(timerIndex, seconds);
+        break;
+      }
       default:
         break;
     }
@@ -292,6 +457,31 @@
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       (openable || groupHeader).click();
+    }
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    const timerButton = event.target.closest(".rest-timer-button[data-action='start-rest-timer']");
+    if (!timerButton) {
+      return;
+    }
+
+    const timerIndex = Number(timerButton.dataset.timerIndex);
+    const seconds = Number(timerButton.dataset.seconds);
+    state.restTimerPressTarget = { timerIndex, seconds };
+    state.restTimerPressTimer = window.setTimeout(() => {
+      state.suppressTimerClickUntil = Date.now() + 900;
+      state.restTimerPressTimer = null;
+      state.openGroupMenuId = null;
+      openModal({ type: "rest-timer-editor", timerIndex, seconds });
+    }, 650);
+  });
+
+  document.addEventListener("pointerup", clearRestTimerPressState);
+  document.addEventListener("pointercancel", clearRestTimerPressState);
+  document.addEventListener("contextmenu", (event) => {
+    if (event.target.closest(".rest-timer-button[data-action='start-rest-timer']")) {
+      event.preventDefault();
     }
   });
 

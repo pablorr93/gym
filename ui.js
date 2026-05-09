@@ -64,8 +64,7 @@
         </div>
         <article class="glass-card" style="--glow: rgba(139, 232, 78, 0.12);">
           <div class="card-body">
-            <p class="section-copy">Resumen de carga</p>
-            <div class="summary-weight">${formatKgCompact(totalTrackedKg(state.storage))} Kg activos en ${totalExercisesCount(state.storage)} ejercicios</div>
+            ${renderRestTimers(state)}
             <div class="card-grid metrics">
               ${renderMetricPill("Listos para subir", String(readyExercisesCount(state.storage)), "var(--accent-strong)")}
               ${renderMetricPill("Bloques musculares", String(roots.length), "var(--accent-warm)")}
@@ -508,6 +507,39 @@
     `;
   }
 
+  function renderRestTimers(state) {
+    const timers = Array.isArray(state.restTimers) && state.restTimers.length ? state.restTimers : [30, 60, 90, 120];
+    const restTimer = state.restTimer || {};
+
+    return `
+      <div class="rest-timer-panel" aria-label="Temporizadores de descanso">
+        ${timers
+          .map((seconds, index) => {
+            const isActive = restTimer.running && restTimer.duration === seconds;
+            const label = isActive ? formatTimer(restTimer.remaining) : formatTimer(seconds);
+            return `
+              <button
+                class="rest-timer-button ${isActive ? "is-active" : ""}"
+                type="button"
+                data-action="start-rest-timer"
+                data-timer-index="${index}"
+                data-seconds="${seconds}"
+                aria-label="Temporizador de ${formatTimer(seconds)}"
+              >${label}</button>
+            `;
+          })
+          .join("")}
+      </div>
+    `;
+  }
+
+  function formatTimer(seconds) {
+    const safeSeconds = Math.max(0, Number(seconds) || 0);
+    const minutes = Math.floor(safeSeconds / 60);
+    const rest = safeSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
+  }
+
   function renderMiniBadge(label, color, extraClass = "") {
     return `<span class="mini-badge ${extraClass}" style="--badge-color: ${color};">${escapeHtml(label)}</span>`;
   }
@@ -573,6 +605,8 @@
         return renderExerciseModal(state);
       case "apply-next":
         return renderApplyNextModal(state);
+      case "rest-timer-editor":
+        return renderRestTimerModal(state);
       default:
         return "";
     }
@@ -731,6 +765,29 @@
         </div>
         <div class="modal-actions">
           <button class="primary-button" type="submit">Aplicar</button>
+        </div>
+      </form>
+    `;
+  }
+
+  function renderRestTimerModal(state) {
+    const seconds = Number(state.modal.seconds) || 30;
+
+    return `
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Editar temporizador</h2>
+          <p class="section-copy">Cambia cuanto quieres que cuente hacia atras.</p>
+        </div>
+        <button class="icon-button" data-action="close-modal" aria-label="Cerrar modal">x</button>
+      </div>
+      <form class="modal-form" data-form="rest-timer-editor">
+        <div class="field">
+          <label for="rest-timer-value">Tiempo</label>
+          <input id="rest-timer-value" name="timerValue" type="text" inputmode="numeric" value="${formatTimer(seconds)}" placeholder="00:45" required />
+        </div>
+        <div class="modal-actions">
+          <button class="primary-button" type="submit">Guardar cambio</button>
         </div>
       </form>
     `;
