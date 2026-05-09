@@ -310,7 +310,7 @@ code {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding-left: calc(var(--depth, 0) * 14px);
+  padding-left: min(calc(var(--depth, 0) * 8px), 24px);
   touch-action: manipulation;
   user-select: none;
 }
