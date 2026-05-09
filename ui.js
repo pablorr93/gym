@@ -288,7 +288,7 @@
               data-exercise-id="${exercise.id}"
               style="--badge-color: var(--accent);"
               aria-label="Aplicar siguiente peso"
-            >${formatKg(exercise.currentKg)}&nbsp; -> ${formatKg(exercise.nextKg)}</button>
+            >${formatKg(exercise.currentKg)}&nbsp; ->&nbsp; ${formatKg(exercise.nextKg)}</button>
             <button
               class="status-weight-badge"
               type="button"

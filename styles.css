@@ -310,7 +310,7 @@ code {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding-left: min(calc(var(--depth, 0) * 8px), 24px);
+  padding-left: min(calc(var(--depth, 0) * 8px), 8px);
   touch-action: manipulation;
   user-select: none;
 }
@@ -321,8 +321,12 @@ code {
 }
 
 .group-shell.is-touch-armed {
-  outline: 2px solid rgba(139, 232, 78, 0.45);
   border-radius: var(--radius-xl);
+}
+
+.group-shell.is-touch-armed > .group-card {
+  outline: 2px solid rgba(139, 232, 78, 0.45);
+  outline-offset: 0;
 }
 
 .group-shell.is-group-drop-before {
@@ -407,9 +411,8 @@ code {
 }
 
 .group-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: grid;
+  justify-items: stretch;
   gap: 8px;
   animation: menuReveal 180ms ease both;
 }
@@ -443,6 +446,7 @@ code {
 .chip-button {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text);
+  width: 100%;
 }
 
 .group-menu-button {
@@ -528,6 +532,13 @@ code {
 }
 
 .child-group-list {
+  width: calc(100% + 22px);
+  max-width: calc(100% + 22px);
+  margin-left: -14px;
+  margin-right: -8px;
+}
+
+.child-group-list .child-group-list {
   width: calc(100% + 22px);
   max-width: calc(100% + 22px);
   margin-left: -14px;
@@ -676,10 +687,15 @@ body.is-touch-drag-active {
 
 .badge-wrap {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   margin: 10px 0 0;
   min-width: 0;
+}
+
+.badge-wrap .status-weight-badge {
+  margin-left: auto;
+  margin-right: 42px;
 }
 
 .mini-badge {
@@ -699,9 +715,9 @@ body.is-touch-drag-active {
 }
 
 .mini-badge.is-weight {
-  min-height: 31px;
-  padding: 7px 11px;
-  font-size: 0.88rem;
+  min-height: 28px;
+  padding: 5px 8px;
+  font-size: 0.94rem;
   font-weight: 900;
 }
 

@@ -32,9 +32,14 @@
     historyPressTimer: null,
     historyPressTarget: null,
     suppressClickUntil: 0,
+    modalHistoryActive: false,
   };
 
   const app = document.querySelector("#app");
+
+  if (!window.history.state?.gymApp) {
+    window.history.replaceState({ gymApp: true }, "", window.location.href);
+  }
 
   function render() {
     app.innerHTML = window.GymUI.renderApp(state);
@@ -47,12 +52,22 @@
   }
 
   function openModal(modal) {
+    if (!state.modal && !state.modalHistoryActive) {
+      window.history.pushState({ gymApp: true, modal: true }, "", window.location.href);
+      state.modalHistoryActive = true;
+    }
     state.modal = modal;
     render();
   }
 
-  function closeModal() {
+  function closeModal(options = {}) {
     state.modal = null;
+    if (state.modalHistoryActive && !options.fromHistory) {
+      state.modalHistoryActive = false;
+      window.history.back();
+    } else if (options.fromHistory) {
+      state.modalHistoryActive = false;
+    }
     render();
   }
 
@@ -64,6 +79,12 @@
     if (event.key === STORAGE_KEY) {
       state.storage = loadStorage();
       render();
+    }
+  });
+
+  window.addEventListener("popstate", () => {
+    if (state.modal) {
+      closeModal({ fromHistory: true });
     }
   });
 
@@ -151,23 +172,26 @@
         break;
       case "delete-exercise":
         if (confirmAction("Se eliminara el ejercicio y todo su historial. Quieres continuar?")) {
-          state.modal = null;
+          const nextStorage = deleteExercise(state.storage, actionEl.dataset.exerciseId);
           state.openGroupMenuId = null;
-          persist(deleteExercise(state.storage, actionEl.dataset.exerciseId));
+          closeModal();
+          persist(nextStorage);
         }
         break;
       case "delete-group":
         if (confirmAction("Se eliminara el grupo, sus subgrupos, ejercicios e historial asociado. Continuar?")) {
-          state.modal = null;
+          const nextStorage = deleteGroup(state.storage, actionEl.dataset.groupId);
           state.openGroupMenuId = null;
-          persist(deleteGroup(state.storage, actionEl.dataset.groupId));
+          closeModal();
+          persist(nextStorage);
         }
         break;
       case "reset-seed":
         if (confirmAction("Se restaurara la plantilla inicial de la rutina. Continuar?")) {
-          state.modal = null;
+          const nextStorage = resetToSeed();
           state.openGroupMenuId = null;
-          persist(resetToSeed());
+          closeModal();
+          persist(nextStorage);
         }
         break;
       case "close-modal":
