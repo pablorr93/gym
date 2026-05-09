@@ -1005,10 +1005,12 @@ body.is-touch-drag-active {
 .icon-button {
   width: 44px;
   height: 44px;
+  flex: 0 0 44px;
+  aspect-ratio: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 0 2px;
+  padding: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text);
@@ -1334,11 +1336,15 @@ body {
 }
 
 .modal {
-  width: min(calc(var(--mobile-frame-width) - 32px), calc(100% - 32px));
+  width: min(calc(var(--mobile-frame-width) - 6px), calc(100% - 6px));
+}
+
+.modal-backdrop {
+  padding: 8px;
 }
 
 .modal-content {
-  padding: 16px;
+  padding: 18px;
 }
 
 .modal-header {
