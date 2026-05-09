@@ -104,7 +104,7 @@ code {
   max-width: 100%;
   margin: 0 auto;
   padding: 20px 0 calc(var(--nav-h) + 42px + env(safe-area-inset-bottom));
-  overflow-x: hidden;
+  overflow-x: visible;
 }
 
 .hero {
@@ -119,8 +119,8 @@ code {
 }
 
 .routine-hero > div:first-child {
-  width: calc(100% + 20px);
-  margin-inline: -10px;
+  width: min(100vw, var(--mobile-frame-width, 100vw));
+  margin-inline: calc((100% - min(100vw, var(--mobile-frame-width, 100vw))) / 2);
 }
 
 .routine-lockup {
@@ -1226,6 +1226,12 @@ body {
 .page {
   width: min(100% - 20px, 100%);
   padding-top: 14px;
+}
+
+.routine-hero > div:first-child {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
 }
 
 .hero,
