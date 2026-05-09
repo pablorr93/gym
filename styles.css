@@ -527,6 +527,12 @@ code {
   transition: background 160ms ease, outline-color 160ms ease;
 }
 
+.child-group-list {
+  width: calc(100% + 16px);
+  max-width: calc(100% + 16px);
+  margin-inline: -8px;
+}
+
 .exercise-drop-section.is-over {
   background: rgba(139, 232, 78, 0.08);
   outline-color: rgba(139, 232, 78, 0.35);
