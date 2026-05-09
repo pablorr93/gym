@@ -514,13 +514,14 @@ code {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow-x: clip;
+  overflow-x: visible;
 }
 
 .exercise-drop-section {
-  width: 100%;
-  max-width: 100%;
+  width: calc(100% + 16px);
+  max-width: calc(100% + 16px);
   min-width: 0;
+  margin-inline: -8px;
   border-radius: 20px;
   outline: 1px solid transparent;
   transition: background 160ms ease, outline-color 160ms ease;
