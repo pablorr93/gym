@@ -368,6 +368,7 @@
   function renderHistoryEntry(state, entry) {
     const exercise = findExercise(state.storage, entry.exerciseId);
     const exerciseName = exercise ? exercise.name : "Ejercicio eliminado";
+    const historyGroup = exercise ? groupLabel(state.storage, findGroup(state.storage, exercise.groupId) || { name: "Sin grupo" }) : "";
     const movement = entry.fromKg == null ? formatKg(entry.toKg || 0) : `${formatKg(entry.fromKg)} -> ${formatKg(entry.toKg || entry.fromKg)}`;
 
     return `
@@ -375,6 +376,7 @@
         <div class="card-body progress-rank">
           <div class="rank-meta">
             <h3 class="exercise-title">${escapeHtml(exerciseName)}</h3>
+            ${historyGroup ? `<p class="gain-group history-group">${escapeHtml(historyGroup)}</p>` : ""}
             <p class="card-copy">${escapeHtml(entryLabel(entry))}</p>
           </div>
           <div class="rank-gap history-meta">

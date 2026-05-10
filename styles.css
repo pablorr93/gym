@@ -1244,6 +1244,11 @@ body.is-touch-drag-active {
   transform: scale(0.995);
 }
 
+.history-group {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
 .history-meta {
   text-align: right;
 }

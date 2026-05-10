@@ -47,10 +47,10 @@ Estado de versiones/cache al ultimo cambio:
 - `index.html`
   - `styles.css?v=67`
   - `data.js?v=34`
-  - `ui.js?v=61`
+  - `ui.js?v=62`
   - `app.js?v=53`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v76"`
+  - `CACHE_NAME = "gym-progress-v77"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -145,6 +145,7 @@ Tras cambios en JS/CSS:
 - El icono de `Progreso` debe mantener lineas algo mas finas que el grosor general para verse equilibrado con `Rutina`.
 - Al cambiar entre `Rutina`, `Progreso` y `Ajustes`, cada pestana debe mantener su posicion de scroll al volver.
 - En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
+- En `Historial de cambios`, cada entrada muestra tambien el grupo/subgrupo del ejercicio con el mismo estilo de ruta que `Progreso por ejercicio`.
 - Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
 - `Ajustes` incluye una tarjeta `Datos en la nube` con botones `Configurar carpeta`, `Guardar en GitHub` y `Cargar desde GitHub`.
 - El hero de `Ajustes` usa el titulo literal `Ajustes`, con la misma separacion entre eyebrow y titulo que el hero de `Progreso`.
