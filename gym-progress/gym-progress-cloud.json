@@ -1,7 +1,7 @@
 {
   "app": "gym-progress-web",
   "version": 1,
-  "exportedAt": "2026-05-10T17:11:01.747Z",
+  "exportedAt": "2026-05-10T18:36:47.646Z",
   "storage": {
     "groups": [
       {
@@ -9,8 +9,8 @@
         "name": "Pecho",
         "order": 0,
         "parentId": null,
-        "isExpanded": false,
-        "updatedAt": "2026-05-09T21:28:21.029Z"
+        "isExpanded": true,
+        "updatedAt": "2026-05-10T18:35:59.952Z"
       },
       {
         "id": "g_brazos",
@@ -18,7 +18,7 @@
         "order": 1,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-09T13:40:27.492Z"
+        "updatedAt": "2026-05-10T18:36:19.777Z"
       },
       {
         "id": "g_biceps",
@@ -26,7 +26,7 @@
         "order": 0,
         "parentId": "g_brazos",
         "isExpanded": false,
-        "updatedAt": "2026-05-10T12:09:17.404Z"
+        "updatedAt": "2026-05-10T17:53:59.894Z"
       },
       {
         "id": "g_triceps",
@@ -34,7 +34,7 @@
         "order": 1,
         "parentId": "g_brazos",
         "isExpanded": false,
-        "updatedAt": "2026-05-09T20:38:18.024Z"
+        "updatedAt": "2026-05-10T17:53:35.410Z"
       },
       {
         "id": "g_hombros",
@@ -49,14 +49,16 @@
         "name": "Abdomen",
         "order": 3,
         "parentId": null,
-        "isExpanded": false
+        "isExpanded": false,
+        "updatedAt": "2026-05-10T17:33:45.952Z"
       },
       {
         "id": "g_correccion",
         "name": "Corregir encorv",
         "order": 4,
         "parentId": null,
-        "isExpanded": false
+        "isExpanded": false,
+        "updatedAt": "2026-05-10T17:33:43.680Z"
       },
       {
         "id": "g_espalda_root",
@@ -64,7 +66,7 @@
         "order": 5,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-07T22:57:35.998Z"
+        "updatedAt": "2026-05-10T17:33:51.285Z"
       },
       {
         "id": "g_espalda",
@@ -110,7 +112,7 @@
         "currentKg": 18,
         "nextKg": 20,
         "order": 0,
-        "updatedAt": "2026-05-10T14:06:05.015Z",
+        "updatedAt": "2026-05-10T18:36:34.607Z",
         "notes": "",
         "readyToIncrease": true,
         "isSeparated": false,
@@ -231,7 +233,7 @@
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 1,
-        "updatedAt": "2026-05-10T13:40:17.126Z"
+        "updatedAt": "2026-05-10T18:36:39.269Z"
       },
       {
         "id": "1778358293706-772006",
@@ -361,7 +363,7 @@
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 0,
-        "updatedAt": "2026-05-09T20:45:45.166Z"
+        "updatedAt": "2026-05-10T17:32:52.378Z"
       },
       {
         "id": "1778359600299-576596",
@@ -374,7 +376,7 @@
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 1,
-        "updatedAt": "2026-05-09T20:46:40.299Z"
+        "updatedAt": "2026-05-10T17:13:08.195Z"
       },
       {
         "id": "1778359636416-675830",
@@ -410,10 +412,10 @@
         "initialKg": 25,
         "currentKg": 30,
         "nextKg": 35,
-        "readyToIncrease": false,
+        "readyToIncrease": true,
         "isSeparated": false,
         "order": 4,
-        "updatedAt": "2026-05-09T20:48:53.507Z"
+        "updatedAt": "2026-05-10T17:13:05.350Z"
       },
       {
         "id": "1778359771025-270791",
@@ -853,7 +855,7 @@
     }
   },
   "restTimers": [
-    1,
+    120,
     30,
     60,
     90
