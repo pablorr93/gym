@@ -31,16 +31,26 @@ Cambios ya aplicados durante la sesion:
 - El boton de atras del movil debe cerrar modales abiertos, igual que pulsar la `x`, en vez de sacar al usuario de la app.
 - Al crear un ejercicio desde el boton `Ejercicio` de un grupo o subgrupo, el selector `Grupo` debe venir preseleccionado con ese grupo/subgrupo. Se corrigio incluyendo todos los grupos en el desplegable, no solo grupos finales.
 - Las opciones del selector de grupo muestran la ruta completa cuando hay anidacion, por ejemplo `Brazos / Biceps`.
+- El icono de `Ajustes` en la navegacion inferior se cambio por un engranaje minimalista, pequeno pero similar en tamano a los iconos de `Rutina` y `Progreso`.
+- En `Progreso`, la caja interna de `Progreso por ejercicio` volvio casi al tamano anterior, dejando solo un poco mas de aire lateral respecto a la tarjeta exterior.
+- Al cambiar entre pestanas, cada pestana conserva su posicion de scroll. Esto aplica a `Rutina`, `Progreso` y `Ajustes`.
+- En `Progreso`, ademas de conservar el scroll general de la pagina, se conservan los scrolls internos de `Progreso por ejercicio` y `Historial de cambios`.
+- Al pulsar un registro de `Progreso por ejercicio` para ir a `Rutina`, al volver despues a `Progreso` debe restaurarse la vista tal como estaba antes de pulsar el registro.
+- En `Ajustes` se anadio una tarjeta `Datos en la nube` para guardar y cargar una copia completa desde GitHub.
+- La copia de nube guarda grupos, subgrupos, ejercicios, pesos, historial y temporizadores.
+- La configuracion de nube se guarda en `localStorage` con la clave `gym_github_cloud_v1` e incluye usuario/organizacion, repositorio, rama, carpeta y token.
+- El archivo remoto de copia se llama `gym-progress-cloud.json` y se guarda dentro de la carpeta configurada del repositorio.
+- La subida/carga real a GitHub requiere un token introducido por el usuario con permisos de contenido del repositorio. No se probo con GitHub real porque no se proporciono token/repositorio.
 
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=58`
+  - `styles.css?v=61`
   - `data.js?v=34`
-  - `ui.js?v=54`
-  - `app.js?v=48`
+  - `ui.js?v=57`
+  - `app.js?v=50`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v63"`
+  - `CACHE_NAME = "gym-progress-v67"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -56,6 +66,7 @@ Crear una app sencilla, visual y usable en movil para registrar la rutina de gim
 - Historial y progreso local.
 - Uso como PWA desde la pantalla principal del movil.
 - Datos guardados localmente en el navegador mediante `localStorage`.
+- Copia opcional en GitHub desde `Ajustes` para poder guardar y cargar todos los datos en otro movil.
 
 La prioridad es que sea comoda en movil y que la pantalla de rutina sea la vista principal, no una landing page.
 
@@ -65,7 +76,7 @@ La prioridad es que sea comoda en movil y que la pantalla de rutina sea la vista
 - `styles.css`: estilos visuales, layout movil, cabecera, tarjetas, modales, barra inferior, FAB, subgrupos y ejercicios.
 - `data.js`: datos semilla, acceso a `localStorage`, helpers de grupos/ejercicios, normalizacion de datos antiguos, formato de Kg y calculos.
 - `ui.js`: renderizado de la interfaz, grupos, subgrupos, modales, tarjetas de ejercicios, progreso y vistas.
-- `app.js`: estado de la app, eventos, formularios, drag/drop, navegacion, historial del boton atras y registro del service worker.
+- `app.js`: estado de la app, eventos, formularios, drag/drop, navegacion, historial del boton atras y registro del service worker. Tambien gestiona temporizadores, conservacion de scroll por pestana y guardado/carga de copias en GitHub.
 - `sw.js`: service worker y cache de la PWA. Hay que actualizar versiones al cambiar assets.
 - `manifest.webmanifest`: configuracion PWA.
 - `assets/prr-header.png`: imagen principal de cabecera.
@@ -130,6 +141,13 @@ Tras cambios en JS/CSS:
 - En `Progreso`, la tarjeta `Progreso por ejercicio` muestra registros por ejercicio con grupo/subgrupo, barra con la misma logica porcentual que las barras de ejercicios y filas clicables.
 - Al pulsar un registro de `Progreso por ejercicio`, la app cambia a `Rutina`, despliega el grupo/subgrupo correspondiente y centra ese ejercicio sin abrir el modal.
 - La navegacion inferior usa iconos SVG para `Rutina`, `Progreso` y `Ajustes`.
+- El icono de `Ajustes` debe seguir siendo un engranaje minimalista y elegante, de tamano cercano al resto de iconos de la barra.
+- Al cambiar entre `Rutina`, `Progreso` y `Ajustes`, cada pestana debe mantener su posicion de scroll al volver.
+- En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
+- Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
+- `Ajustes` incluye una tarjeta `Datos en la nube` con botones `Configurar carpeta`, `Guardar en GitHub` y `Cargar desde GitHub`.
+- La nube debe guardar/cargar toda la rutina: grupos, subgrupos, ejercicios, pesos actuales/iniciales/siguiente subida, historial y temporizadores.
+- La configuracion de GitHub se introduce en un modal y se conserva localmente. Tratar el token como dato sensible: no imprimirlo en logs ni documentarlo en texto visible.
 
 ## Problemas que hubo antes con el preview
 
@@ -141,8 +159,10 @@ Tras cambios en JS/CSS:
 
 ## Ultima verificacion conocida
 
-Se verifico en el navegador interno con `http://127.0.0.1:8000/`:
+Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=cloud-scroll-v50`:
 
-- Abrir nuevo ejercicio desde `Brazos` preselecciona `Brazos`.
-- Abrir nuevo ejercicio desde `Biceps` preselecciona `Brazos / Biceps`.
+- Aparece la tarjeta `Datos en la nube` en `Ajustes`.
+- Abre correctamente el modal `Carpeta de GitHub` con usuario/organizacion, repositorio, rama, carpeta y token.
+- Al desplazarse en `Ajustes`, cambiar a otra pestana y volver, se conserva la posicion.
+- En `Progreso`, al cambiar a `Ajustes` y volver, se conserva el punto de la pagina y los scrolls internos.
 - Los archivos `data.js`, `ui.js` y `app.js` pasaron `node --check`.
