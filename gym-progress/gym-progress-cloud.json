@@ -1,0 +1,861 @@
+{
+  "app": "gym-progress-web",
+  "version": 1,
+  "exportedAt": "2026-05-10T17:11:01.747Z",
+  "storage": {
+    "groups": [
+      {
+        "id": "g_pecho",
+        "name": "Pecho",
+        "order": 0,
+        "parentId": null,
+        "isExpanded": false,
+        "updatedAt": "2026-05-09T21:28:21.029Z"
+      },
+      {
+        "id": "g_brazos",
+        "name": "Brazos",
+        "order": 1,
+        "parentId": null,
+        "isExpanded": false,
+        "updatedAt": "2026-05-09T13:40:27.492Z"
+      },
+      {
+        "id": "g_biceps",
+        "name": "Biceps",
+        "order": 0,
+        "parentId": "g_brazos",
+        "isExpanded": false,
+        "updatedAt": "2026-05-10T12:09:17.404Z"
+      },
+      {
+        "id": "g_triceps",
+        "name": "Triceps",
+        "order": 1,
+        "parentId": "g_brazos",
+        "isExpanded": false,
+        "updatedAt": "2026-05-09T20:38:18.024Z"
+      },
+      {
+        "id": "g_hombros",
+        "name": "Hombros",
+        "order": 2,
+        "parentId": null,
+        "isExpanded": false,
+        "updatedAt": "2026-05-10T10:26:33.527Z"
+      },
+      {
+        "id": "g_abdomen",
+        "name": "Abdomen",
+        "order": 3,
+        "parentId": null,
+        "isExpanded": false
+      },
+      {
+        "id": "g_correccion",
+        "name": "Corregir encorv",
+        "order": 4,
+        "parentId": null,
+        "isExpanded": false
+      },
+      {
+        "id": "g_espalda_root",
+        "name": "Espalda",
+        "order": 5,
+        "parentId": null,
+        "isExpanded": false,
+        "updatedAt": "2026-05-07T22:57:35.998Z"
+      },
+      {
+        "id": "g_espalda",
+        "name": "Espalda",
+        "order": 0,
+        "parentId": "g_espalda_root",
+        "isExpanded": false
+      },
+      {
+        "id": "g_lumbares",
+        "name": "Lumbares",
+        "order": 1,
+        "parentId": "g_espalda_root",
+        "isExpanded": false
+      },
+      {
+        "id": "g_inferior",
+        "name": "Inferior",
+        "order": 6,
+        "parentId": null,
+        "isExpanded": false
+      },
+      {
+        "id": "g_gemelos",
+        "name": "Gemelos",
+        "order": 0,
+        "parentId": "g_inferior",
+        "isExpanded": false
+      },
+      {
+        "id": "g_gluteos",
+        "name": "Gluteos",
+        "order": 1,
+        "parentId": "g_inferior",
+        "isExpanded": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "e_pecho_mancuernas",
+        "groupId": "g_pecho",
+        "name": "Pecho Mancuernas",
+        "currentKg": 18,
+        "nextKg": 20,
+        "order": 0,
+        "updatedAt": "2026-05-10T14:06:05.015Z",
+        "notes": "",
+        "readyToIncrease": true,
+        "isSeparated": false,
+        "initialKg": 12
+      },
+      {
+        "id": "e_pecho_abierto_maquina",
+        "groupId": "g_pecho",
+        "name": "Pecho Abierto Maquina",
+        "currentKg": 30,
+        "nextKg": 35,
+        "order": 2,
+        "updatedAt": "2026-05-10T12:37:32.995Z",
+        "notes": "",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 25
+      },
+      {
+        "id": "e_pecho_disco",
+        "groupId": "g_pecho",
+        "name": "Pecho Disco 💿",
+        "currentKg": 10,
+        "nextKg": 12,
+        "order": 3,
+        "updatedAt": "2026-05-10T13:25:41.236Z",
+        "notes": "",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 10
+      },
+      {
+        "id": "e_biceps_barra",
+        "groupId": "g_biceps",
+        "name": "Biceps Barra",
+        "currentKg": 10,
+        "nextKg": 15,
+        "order": 0,
+        "updatedAt": "2026-05-09T20:31:24.793Z",
+        "notes": "",
+        "readyToIncrease": true,
+        "isSeparated": false,
+        "initialKg": 10
+      },
+      {
+        "id": "e_biceps_mancuernas",
+        "groupId": "g_biceps",
+        "name": "Biceps Mancuernas",
+        "currentKg": 7,
+        "nextKg": 8,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:30:18.344Z",
+        "notes": "",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 6
+      },
+      {
+        "id": "e_biceps_poleas",
+        "groupId": "g_biceps",
+        "name": "Abierto Poleas",
+        "currentKg": 15,
+        "nextKg": 20,
+        "order": 2,
+        "updatedAt": "2026-05-10T13:27:48.127Z",
+        "notes": "2 pasos adelante, 1 hacía el bíceps a trabajar, flexión hacía el exterior con codo pegado. Poleas altura de las muñecas",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 12.5
+      },
+      {
+        "id": "e_triceps_cuerda",
+        "groupId": "g_triceps",
+        "name": "Poleas Exterior",
+        "currentKg": 25,
+        "nextKg": 30,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:39:49.642Z",
+        "notes": "",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 20
+      },
+      {
+        "id": "e_gluteos_hip",
+        "groupId": "g_gluteos",
+        "name": "Hip Thrust",
+        "currentKg": 60,
+        "nextKg": 65,
+        "order": 0,
+        "updatedAt": "2026-05-07T13:50:56.665Z",
+        "notes": "",
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "initialKg": 60
+      },
+      {
+        "id": "1778358196009-1029868",
+        "groupId": "g_pecho",
+        "name": "Pecho Abajo Abierto",
+        "notes": "",
+        "initialKg": 30,
+        "currentKg": 35,
+        "nextKg": 40,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 4,
+        "updatedAt": "2026-05-09T20:27:28.124Z"
+      },
+      {
+        "id": "1778358255471-1005875",
+        "groupId": "g_pecho",
+        "name": "Pecho Maquina",
+        "notes": "",
+        "initialKg": 25,
+        "currentKg": 30,
+        "nextKg": 35,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 1,
+        "updatedAt": "2026-05-10T13:40:17.126Z"
+      },
+      {
+        "id": "1778358293706-772006",
+        "groupId": "g_pecho",
+        "name": "Pecho Abierto 2 Poleas",
+        "notes": "",
+        "initialKg": 10,
+        "currentKg": 10,
+        "nextKg": 15,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 0,
+        "updatedAt": "2026-05-10T10:26:20.363Z"
+      },
+      {
+        "id": "1778358335252-23696",
+        "groupId": "g_pecho",
+        "name": "Pecho Abierto Mancuernas",
+        "notes": "",
+        "initialKg": 7,
+        "currentKg": 7,
+        "nextKg": 9,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:25:39.481Z"
+      },
+      {
+        "id": "1778358385109-153645",
+        "groupId": "g_pecho",
+        "name": "Presbanca maquina",
+        "notes": "",
+        "initialKg": 45,
+        "currentKg": 45,
+        "nextKg": 50,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 2,
+        "updatedAt": "2026-05-09T20:26:35.446Z"
+      },
+      {
+        "id": "1778359054060-584173",
+        "groupId": "g_biceps",
+        "name": "Abierto Mancuernas",
+        "notes": "",
+        "initialKg": 7,
+        "currentKg": 8,
+        "nextKg": 10,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 0,
+        "updatedAt": "2026-05-09T20:37:52.466Z"
+      },
+      {
+        "id": "1778359131477-787812",
+        "groupId": "g_triceps",
+        "name": "Poleas Barra",
+        "notes": "",
+        "initialKg": 40,
+        "currentKg": 45,
+        "nextKg": 50,
+        "readyToIncrease": true,
+        "isSeparated": false,
+        "order": 0,
+        "updatedAt": "2026-05-10T12:08:42.232Z"
+      },
+      {
+        "id": "1778359223372-854530",
+        "groupId": "g_triceps",
+        "name": "Maquina Cuerpo",
+        "notes": "",
+        "initialKg": 0,
+        "currentKg": 0,
+        "nextKg": 0,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 2,
+        "updatedAt": "2026-05-09T20:40:23.372Z"
+      },
+      {
+        "id": "1778359270909-132296",
+        "groupId": "g_triceps",
+        "name": "Poleas 1 Cable",
+        "notes": "1 paso hacia delante",
+        "initialKg": 10,
+        "currentKg": 12.5,
+        "nextKg": 15,
+        "readyToIncrease": true,
+        "isSeparated": true,
+        "order": 0,
+        "updatedAt": "2026-05-10T13:26:26.911Z"
+      },
+      {
+        "id": "1778359387521-62388",
+        "groupId": "g_triceps",
+        "name": "1 Mancuerna",
+        "notes": "",
+        "initialKg": 14,
+        "currentKg": 16,
+        "nextKg": 18,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:43:17.285Z"
+      },
+      {
+        "id": "1778359429381-555327",
+        "groupId": "g_triceps",
+        "name": "Maquina Abajo",
+        "notes": "",
+        "initialKg": 45,
+        "currentKg": 50,
+        "nextKg": 55,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 2,
+        "updatedAt": "2026-05-09T20:44:00.830Z"
+      },
+      {
+        "id": "1778359545166-804072",
+        "groupId": "g_hombros",
+        "name": "Hombro Mancuenas Frente Ladeado",
+        "notes": "",
+        "initialKg": 6,
+        "currentKg": 10,
+        "nextKg": 12,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 0,
+        "updatedAt": "2026-05-09T20:45:45.166Z"
+      },
+      {
+        "id": "1778359600299-576596",
+        "groupId": "g_hombros",
+        "name": "Hombro Barra Poleas Frente",
+        "notes": "",
+        "initialKg": 20,
+        "currentKg": 20,
+        "nextKg": 25,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:46:40.299Z"
+      },
+      {
+        "id": "1778359636416-675830",
+        "groupId": "g_hombros",
+        "name": "Poleas Lado Detrás 1 Cable",
+        "notes": "",
+        "initialKg": 5,
+        "currentKg": 10,
+        "nextKg": 15,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 2,
+        "updatedAt": "2026-05-09T20:47:16.416Z"
+      },
+      {
+        "id": "1778359689013-378203",
+        "groupId": "g_hombros",
+        "name": "Poleas Lado Delante",
+        "notes": "",
+        "initialKg": 5,
+        "currentKg": 10,
+        "nextKg": 15,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 3,
+        "updatedAt": "2026-05-09T20:48:09.013Z"
+      },
+      {
+        "id": "1778359733507-1897",
+        "groupId": "g_hombros",
+        "name": "Arriba Maquina",
+        "notes": "",
+        "initialKg": 25,
+        "currentKg": 30,
+        "nextKg": 35,
+        "readyToIncrease": false,
+        "isSeparated": false,
+        "order": 4,
+        "updatedAt": "2026-05-09T20:48:53.507Z"
+      },
+      {
+        "id": "1778359771025-270791",
+        "groupId": "g_hombros",
+        "name": "Hombro Mancuernas Frente",
+        "notes": "",
+        "initialKg": 6,
+        "currentKg": 7,
+        "nextKg": 8,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 0,
+        "updatedAt": "2026-05-09T20:51:58.439Z"
+      },
+      {
+        "id": "1778359816596-226365",
+        "groupId": "g_hombros",
+        "name": "Hombro Mancuernas Lado",
+        "notes": "",
+        "initialKg": 6,
+        "currentKg": 7,
+        "nextKg": 8,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 1,
+        "updatedAt": "2026-05-09T20:52:07.723Z"
+      },
+      {
+        "id": "1778359881592-1022553",
+        "groupId": "g_hombros",
+        "name": "Hombro Mancuernas Arriba",
+        "notes": "",
+        "initialKg": 8,
+        "currentKg": 10,
+        "nextKg": 11,
+        "readyToIncrease": false,
+        "isSeparated": true,
+        "order": 2,
+        "updatedAt": "2026-05-09T20:51:28.757Z"
+      }
+    ],
+    "entries": [
+      {
+        "id": "log_e_pecho_mancuernas",
+        "exerciseId": "e_pecho_mancuernas",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 18,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_pecho_abierto_maquina",
+        "exerciseId": "e_pecho_abierto_maquina",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 30,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_pecho_disco",
+        "exerciseId": "e_pecho_disco",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_biceps_barra",
+        "exerciseId": "e_biceps_barra",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_biceps_mancuernas",
+        "exerciseId": "e_biceps_mancuernas",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 8,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_biceps_poleas",
+        "exerciseId": "e_biceps_poleas",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 15,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_triceps_cuerda",
+        "exerciseId": "e_triceps_cuerda",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 20,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "log_e_gluteos_hip",
+        "exerciseId": "e_gluteos_hip",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 60,
+        "createdAt": "2026-05-07T13:50:56.665Z",
+        "note": "Ejercicio inicial"
+      },
+      {
+        "id": "1778164844232-220521",
+        "exerciseId": "e_biceps_mancuernas",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 8,
+        "toKg": 10,
+        "createdAt": "2026-05-07T14:40:44.232Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778171681021-11392",
+        "exerciseId": "e_pecho_abierto_maquina",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 30,
+        "toKg": 35,
+        "createdAt": "2026-05-07T16:34:41.021Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778187312761-728102",
+        "exerciseId": "e_pecho_mancuernas",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 24,
+        "toKg": 26,
+        "createdAt": "2026-05-07T20:55:12.760Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778187315235-199481",
+        "exerciseId": "e_pecho_abierto_maquina",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 35,
+        "toKg": 40,
+        "createdAt": "2026-05-07T20:55:15.235Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778187317430-493781",
+        "exerciseId": "e_pecho_abierto_maquina",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 40,
+        "toKg": 45,
+        "createdAt": "2026-05-07T20:55:17.430Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778187331522-219518",
+        "exerciseId": "e_pecho_abierto_maquina",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 45,
+        "toKg": 50,
+        "createdAt": "2026-05-07T20:55:31.522Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778187987748-911020",
+        "exerciseId": "e_pecho_disco",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 10,
+        "toKg": 12.5,
+        "createdAt": "2026-05-07T21:06:27.748Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778193203326-443734",
+        "exerciseId": "e_pecho_mancuernas",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 26,
+        "toKg": 28,
+        "createdAt": "2026-05-07T22:33:23.326Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778193264533-422566",
+        "exerciseId": "e_pecho_disco",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 12.5,
+        "toKg": 15,
+        "createdAt": "2026-05-07T22:34:24.533Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778193283954-575101",
+        "exerciseId": "e_pecho_disco",
+        "type": "manualEdit",
+        "metric": "currentKg",
+        "fromKg": 15,
+        "toKg": 10,
+        "createdAt": "2026-05-07T22:34:43.954Z",
+        "note": "Peso actual actualizado"
+      },
+      {
+        "id": "1778358196010-524167",
+        "exerciseId": "1778358196009-1029868",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 35,
+        "createdAt": "2026-05-09T20:23:16.009Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778358255471-667589",
+        "exerciseId": "1778358255471-1005875",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 35,
+        "createdAt": "2026-05-09T20:24:15.471Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778358293706-872136",
+        "exerciseId": "1778358293706-772006",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-09T20:24:53.706Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778358335252-636014",
+        "exerciseId": "1778358335252-23696",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 7,
+        "createdAt": "2026-05-09T20:25:35.252Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778358385109-541095",
+        "exerciseId": "1778358385109-153645",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 45,
+        "createdAt": "2026-05-09T20:26:25.109Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359054061-492931",
+        "exerciseId": "1778359054060-584173",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 8,
+        "createdAt": "2026-05-09T20:37:34.060Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359131478-936551",
+        "exerciseId": "1778359131477-787812",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 45,
+        "createdAt": "2026-05-09T20:38:51.477Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359223372-512882",
+        "exerciseId": "1778359223372-854530",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 0,
+        "createdAt": "2026-05-09T20:40:23.372Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359270910-727247",
+        "exerciseId": "1778359270909-132296",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 12.5,
+        "createdAt": "2026-05-09T20:41:10.909Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359387521-215136",
+        "exerciseId": "1778359387521-62388",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 16,
+        "createdAt": "2026-05-09T20:43:07.521Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359429381-884315",
+        "exerciseId": "1778359429381-555327",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 50,
+        "createdAt": "2026-05-09T20:43:49.381Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359545167-169410",
+        "exerciseId": "1778359545166-804072",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-09T20:45:45.166Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359600299-1040714",
+        "exerciseId": "1778359600299-576596",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 20,
+        "createdAt": "2026-05-09T20:46:40.299Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359636416-468808",
+        "exerciseId": "1778359636416-675830",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-09T20:47:16.416Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359689013-865483",
+        "exerciseId": "1778359689013-378203",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-09T20:48:09.013Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359733507-577121",
+        "exerciseId": "1778359733507-1897",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 30,
+        "createdAt": "2026-05-09T20:48:53.507Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359771025-759923",
+        "exerciseId": "1778359771025-270791",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 7,
+        "createdAt": "2026-05-09T20:49:31.025Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359816596-664081",
+        "exerciseId": "1778359816596-226365",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 7,
+        "createdAt": "2026-05-09T20:50:16.596Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778359881592-604079",
+        "exerciseId": "1778359881592-1022553",
+        "type": "createdExercise",
+        "metric": "currentKg",
+        "fromKg": null,
+        "toKg": 10,
+        "createdAt": "2026-05-09T20:51:21.592Z",
+        "note": "Ejercicio creado"
+      },
+      {
+        "id": "1778420412012-661590",
+        "exerciseId": "1778358255471-1005875",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 30,
+        "toKg": 35,
+        "createdAt": "2026-05-10T13:40:12.012Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778420417126-403963",
+        "exerciseId": "1778358255471-1005875",
+        "type": "manualEdit",
+        "metric": "currentKg",
+        "fromKg": 35,
+        "toKg": 30,
+        "createdAt": "2026-05-10T13:40:17.126Z",
+        "note": "Peso actual actualizado"
+      }
+    ],
+    "snapshot": {
+      "seedVersion": 1,
+      "createdAt": "2026-05-07T13:50:56.665Z"
+    }
+  },
+  "restTimers": [
+    1,
+    30,
+    60,
+    90
+  ]
+}
