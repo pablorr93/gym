@@ -48,9 +48,9 @@ Estado de versiones/cache al ultimo cambio:
   - `styles.css?v=67`
   - `data.js?v=34`
   - `ui.js?v=61`
-  - `app.js?v=52`
+  - `app.js?v=53`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v75"`
+  - `CACHE_NAME = "gym-progress-v76"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -153,7 +153,7 @@ Tras cambios en JS/CSS:
 - La nube debe guardar/cargar toda la rutina: grupos, subgrupos, ejercicios, pesos actuales/iniciales/siguiente subida, historial y temporizadores.
 - La configuracion de GitHub se introduce en un modal y se conserva localmente. Tratar el token como dato sensible: no imprimirlo en logs ni documentarlo en texto visible.
 - Al arrastrar grupos, subgrupos o ejercicios, debe verse claramente donde va a quedar antes de soltarlo. En grupos, la linea verde de destino debe aparecer sobre la tarjeta visible, igual que ocurre con ejercicios.
-- Durante el arrastre tactil, el scroll debe tener una zona central muerta donde no se mueve. Al subir hacia la zona media/superior debe desplazarse hacia arriba de forma progresiva, y al bajar hacia la zona media/inferior debe desplazarse hacia abajo de forma progresiva.
+- Durante el arrastre tactil o desktop, el auto-scroll se controla con `updateAutoScroll`, `startAutoScrollLoop` y `stopAutoScrollLoop`, usando `requestAnimationFrame`, una zona muerta central del 50%, velocidad progresiva segun distancia al borde y limite maximo para evitar aceleraciones bruscas.
 
 ## Problemas que hubo antes con el preview
 

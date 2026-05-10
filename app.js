@@ -16,12 +16,15 @@
     deleteGroup,
     resetToSeed,
     parseWeight,
+    clamp,
   } = window.GymData;
 
   const REST_TIMER_SLOTS_KEY = "gym_rest_timer_slots_v1";
   const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
   const GITHUB_CLOUD_KEY = "gym_github_cloud_v1";
   const GITHUB_CLOUD_FILE = "gym-progress-cloud.json";
+  const AUTO_SCROLL_DEAD_ZONE_RATIO = 0.5;
+  const AUTO_SCROLL_MAX_SPEED = 14;
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
@@ -47,6 +50,10 @@
     pendingTouchDrag: null,
     longPressTimer: null,
     autoScrollFrame: null,
+    autoScrollSpeed: 0,
+    autoScrollContainer: null,
+    autoScrollPointerX: 0,
+    autoScrollPointerY: 0,
     historyPressTimer: null,
     historyPressTarget: null,
     restTimerPressTimer: null,
@@ -965,6 +972,7 @@
   document.addEventListener("dragend", (event) => {
     event.target.closest("[data-drag-exercise-id]")?.classList.remove("is-dragging");
     event.target.closest("[data-drag-group-id]")?.classList.remove("is-dragging");
+    stopAutoScrollLoop();
     clearDropHighlights();
     state.draggingExerciseId = null;
     state.draggingGroupId = null;
@@ -977,12 +985,14 @@
 
     const placement = getActiveDropPlacement(event.clientX, event.clientY);
     if (!placement) {
+      updateAutoScroll(event.clientY, event.clientX);
       return;
     }
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     highlightDropPlacement(placement);
+    updateAutoScroll(event.clientY, event.clientX);
   });
 
   document.addEventListener("dragleave", (event) => {
@@ -1003,6 +1013,7 @@
     event.preventDefault();
     const type = event.dataTransfer.getData("application/x-gym-drag-type") || (state.draggingGroupId ? "group" : "exercise");
     const id = event.dataTransfer.getData("text/plain") || state.draggingExerciseId || state.draggingGroupId;
+    stopAutoScrollLoop();
     clearDropHighlights();
     state.draggingExerciseId = null;
     state.draggingGroupId = null;
@@ -1044,7 +1055,7 @@
       document.body.classList.add("is-touch-drag-active");
       pending.element.classList.remove("is-touch-armed");
       pending.element.classList.add("is-touch-dragging");
-      scheduleTouchAutoScroll();
+      updateAutoScroll(pending.startY, pending.startX);
       if (navigator.vibrate) {
         navigator.vibrate(18);
       }
@@ -1068,7 +1079,7 @@
     state.touchDrag.x = touch.clientX;
     state.touchDrag.y = touch.clientY;
     highlightDropPlacement(getActiveDropPlacement(touch.clientX, touch.clientY));
-    scheduleTouchAutoScroll();
+    updateAutoScroll(touch.clientY, touch.clientX);
   }, { passive: false });
 
   document.addEventListener("touchend", () => {
@@ -1301,7 +1312,7 @@
 
   function clearTouchDragState() {
     clearLongPressTimer();
-    clearTouchAutoScroll();
+    stopAutoScrollLoop();
     document.querySelectorAll(".exercise-card.is-touch-armed, .exercise-card.is-touch-dragging").forEach((card) => {
       card.classList.remove("is-touch-armed", "is-touch-dragging");
     });
@@ -1329,53 +1340,145 @@
     return Math.hypot(touch.clientX - pending.startX, touch.clientY - pending.startY) > 14;
   }
 
-  function autoScrollForTouch(y) {
-    const topZone = window.innerHeight * 0.42;
-    const bottomZone = window.innerHeight * 0.58;
-    const maxStep = 10;
-    let delta = 0;
-    if (y < topZone) {
-      delta = -Math.max(2, Math.round(((topZone - y) / topZone) * maxStep));
-    } else if (y > bottomZone) {
-      delta = Math.max(2, Math.round(((y - bottomZone) / (window.innerHeight - bottomZone)) * maxStep));
+  function updateAutoScroll(pointerY, pointerX = window.innerWidth / 2) {
+    state.autoScrollPointerX = pointerX;
+    state.autoScrollPointerY = pointerY;
+    state.autoScrollContainer = findAutoScrollContainer(pointerX, pointerY);
+    state.autoScrollSpeed = calculateAutoScrollSpeed(state.autoScrollContainer, pointerY);
+
+    if (state.autoScrollSpeed === 0) {
+      stopAutoScrollLoop();
+      return;
     }
 
-    if (!delta) {
-      return false;
-    }
-
-    const scroller = document.scrollingElement || document.documentElement;
-    const previousTop = scroller.scrollTop;
-    scroller.scrollTop += delta;
-    return scroller.scrollTop !== previousTop;
+    startAutoScrollLoop();
   }
 
-  function scheduleTouchAutoScroll() {
-    if (state.autoScrollFrame || !state.touchDrag) {
+  function startAutoScrollLoop() {
+    if (state.autoScrollFrame) {
       return;
     }
 
     const tick = () => {
       state.autoScrollFrame = null;
-      if (!state.touchDrag) {
+      if (!state.draggingExerciseId && !state.draggingGroupId && !state.touchDrag) {
+        stopAutoScrollLoop();
         return;
       }
 
-      const didScroll = autoScrollForTouch(state.touchDrag.y);
-      highlightDropPlacement(getActiveDropPlacement(state.touchDrag.x, state.touchDrag.y));
+      if (state.autoScrollSpeed === 0 || !state.autoScrollContainer) {
+        stopAutoScrollLoop();
+        return;
+      }
+
+      const didScroll = applyAutoScroll();
+      const placement = getActiveDropPlacement(state.autoScrollPointerX, state.autoScrollPointerY);
+      highlightDropPlacement(placement);
       if (didScroll) {
+        state.autoScrollSpeed = calculateAutoScrollSpeed(state.autoScrollContainer, state.autoScrollPointerY);
         state.autoScrollFrame = window.requestAnimationFrame(tick);
+      } else {
+        stopAutoScrollLoop();
       }
     };
 
     state.autoScrollFrame = window.requestAnimationFrame(tick);
   }
 
-  function clearTouchAutoScroll() {
+  function stopAutoScrollLoop() {
     if (state.autoScrollFrame) {
       window.cancelAnimationFrame(state.autoScrollFrame);
       state.autoScrollFrame = null;
     }
+    state.autoScrollSpeed = 0;
+    state.autoScrollContainer = null;
+  }
+
+  function findAutoScrollContainer(x, y) {
+    let element = document.elementFromPoint(x, y);
+    while (element && element !== document.documentElement) {
+      if (isScrollableY(element)) {
+        return element;
+      }
+      element = element.parentElement;
+    }
+
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function isScrollableY(element) {
+    if (!(element instanceof HTMLElement)) {
+      return false;
+    }
+
+    const overflowY = window.getComputedStyle(element).overflowY;
+    return /(auto|scroll|overlay)/.test(overflowY) && element.scrollHeight > element.clientHeight + 1;
+  }
+
+  function calculateAutoScrollSpeed(container, pointerY) {
+    if (!container) {
+      return 0;
+    }
+
+    const bounds = getScrollContainerBounds(container);
+    const activationSize = bounds.height * ((1 - AUTO_SCROLL_DEAD_ZONE_RATIO) / 2);
+    if (activationSize <= 0) {
+      return 0;
+    }
+
+    const topActivationEnd = bounds.top + activationSize;
+    const bottomActivationStart = bounds.bottom - activationSize;
+    let speed = 0;
+
+    if (pointerY < topActivationEnd) {
+      const ratio = clamp((topActivationEnd - pointerY) / activationSize, 0, 1);
+      speed = -AUTO_SCROLL_MAX_SPEED * Math.pow(ratio, 1.55);
+    } else if (pointerY > bottomActivationStart) {
+      const ratio = clamp((pointerY - bottomActivationStart) / activationSize, 0, 1);
+      speed = AUTO_SCROLL_MAX_SPEED * Math.pow(ratio, 1.55);
+    }
+
+    if (!canScrollContainer(container, speed)) {
+      return 0;
+    }
+
+    return Math.abs(speed) < 0.2 ? 0 : speed;
+  }
+
+  function getScrollContainerBounds(container) {
+    if (isDocumentScroller(container)) {
+      return { top: 0, bottom: window.innerHeight, height: window.innerHeight };
+    }
+
+    const rect = container.getBoundingClientRect();
+    return { top: rect.top, bottom: rect.bottom, height: rect.height };
+  }
+
+  function isDocumentScroller(container) {
+    return container === document.scrollingElement || container === document.documentElement || container === document.body;
+  }
+
+  function canScrollContainer(container, speed) {
+    if (!speed) {
+      return false;
+    }
+
+    const maxScroll = container.scrollHeight - container.clientHeight;
+    if (speed < 0) {
+      return container.scrollTop > 0;
+    }
+    return container.scrollTop < maxScroll;
+  }
+
+  function applyAutoScroll() {
+    const container = state.autoScrollContainer;
+    if (!container || !state.autoScrollSpeed) {
+      return false;
+    }
+
+    const previousTop = container.scrollTop;
+    container.scrollTop += state.autoScrollSpeed;
+    return container.scrollTop !== previousTop;
   }
 
   if ("serviceWorker" in navigator) {
