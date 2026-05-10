@@ -1323,14 +1323,18 @@ body.is-touch-drag-active {
 }
 
 .nav-button[data-tab="settings"] .nav-icon svg {
-  width: 21px;
-  height: 21px;
+  width: 22px;
+  height: 22px;
   stroke-width: 1.95;
 }
 
 .nav-button[data-tab="routine"] .nav-icon,
 .nav-button[data-tab="progress"] .nav-icon {
   font-size: 1.16rem;
+}
+
+.nav-button[data-tab="progress"] .nav-icon svg {
+  stroke-width: 1.85;
 }
 
 .nav-label {

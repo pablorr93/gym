@@ -45,12 +45,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=61`
+  - `styles.css?v=63`
   - `data.js?v=34`
-  - `ui.js?v=57`
+  - `ui.js?v=59`
   - `app.js?v=50`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v67"`
+  - `CACHE_NAME = "gym-progress-v71"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -141,7 +141,8 @@ Tras cambios en JS/CSS:
 - En `Progreso`, la tarjeta `Progreso por ejercicio` muestra registros por ejercicio con grupo/subgrupo, barra con la misma logica porcentual que las barras de ejercicios y filas clicables.
 - Al pulsar un registro de `Progreso por ejercicio`, la app cambia a `Rutina`, despliega el grupo/subgrupo correspondiente y centra ese ejercicio sin abrir el modal.
 - La navegacion inferior usa iconos SVG para `Rutina`, `Progreso` y `Ajustes`.
-- El icono de `Ajustes` debe seguir siendo un engranaje minimalista y elegante, de tamano cercano al resto de iconos de la barra.
+- El icono de `Ajustes` debe seguir siendo un engranaje minimalista y elegante, de tamano visual similar al icono de `Rutina`.
+- El icono de `Progreso` debe mantener lineas algo mas finas que el grosor general para verse equilibrado con `Rutina`.
 - Al cambiar entre `Rutina`, `Progreso` y `Ajustes`, cada pestana debe mantener su posicion de scroll al volver.
 - En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
 - Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
