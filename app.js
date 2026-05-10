@@ -23,7 +23,7 @@
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
-  const TIMER_SOUND_REPEAT_DELAY_MS = 300;
+  const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
     "./assets/sounds/timer-complete.wav",
@@ -83,6 +83,45 @@
     state.storage = storage;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
     render();
+  }
+
+  function persistSilently(storage) {
+    state.storage = storage;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+  }
+
+  function expandGroupPath(storage, groupId) {
+    const expandedIds = new Set();
+    let group = findGroup(storage, groupId);
+
+    while (group) {
+      expandedIds.add(group.id);
+      group = group.parentId ? findGroup(storage, group.parentId) : null;
+    }
+
+    if (!expandedIds.size) {
+      return storage;
+    }
+
+    return {
+      ...storage,
+      groups: storage.groups.map((item) =>
+        expandedIds.has(item.id) ? { ...item, isExpanded: true } : item,
+      ),
+    };
+  }
+
+  function focusExerciseCard(exerciseId) {
+    const target = document.querySelector(`[data-drag-exercise-id="${exerciseId}"]`);
+    if (!target) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    target.classList.add("is-focus-target");
+    window.setTimeout(() => {
+      target.classList.remove("is-focus-target");
+    }, 1700);
   }
 
   function openModal(modal) {
@@ -420,6 +459,20 @@
         state.openGroupMenuId = null;
         render();
         break;
+      case "focus-routine-exercise": {
+        event.stopPropagation();
+        const exercise = findExercise(state.storage, actionEl.dataset.exerciseId);
+        if (!exercise) {
+          return;
+        }
+        state.currentTab = "routine";
+        state.modal = null;
+        state.openGroupMenuId = null;
+        persistSilently(expandGroupPath(state.storage, exercise.groupId));
+        render();
+        window.setTimeout(() => focusExerciseCard(exercise.id), 80);
+        break;
+      }
       case "toggle-group":
         state.openGroupMenuId = null;
         persist(toggleGroupExpanded(state.storage, actionEl.dataset.groupId));

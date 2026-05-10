@@ -396,13 +396,16 @@
       .map((exercise) => {
         const initialKg = Number(exercise.initialKg ?? exercise.currentKg ?? 0);
         const currentKg = Number(exercise.currentKg ?? 0);
+        const stepKg = Math.max(0, Number(exercise.nextKg || 0) - currentKg);
+        const gainedKg = Math.max(0, currentKg - initialKg);
         return {
           id: exercise.id,
           name: exercise.name,
           groupName: groupLabel(storage, findGroup(storage, exercise.groupId) || { name: "Sin grupo" }),
           initialKg,
           currentKg,
-          gainedKg: Math.max(0, currentKg - initialKg),
+          gainedKg,
+          progress: stepKg <= 0 ? 0 : clamp(gainedKg / (stepKg * 10), 0, 1),
         };
       })
       .filter((exercise) => exercise.gainedKg > 0)
@@ -414,23 +417,26 @@
       return renderEmptyState("Todavia no hay subidas registradas.", "Cuando un ejercicio supere su peso inicial, aparecera aqui.");
     }
 
-    const maxGain = Math.max(...items.map((item) => item.gainedKg));
-
     return `
-      <div class="gain-chart" role="img" aria-label="Grafica de kilos ganados por ejercicio">
+      <div class="gain-chart" aria-label="Grafica de kilos ganados por ejercicio">
         ${items
           .map((item) => {
-            const value = maxGain > 0 ? clamp(item.gainedKg / maxGain, 0, 1) : 0;
             return `
-              <div class="gain-row">
+              <button
+                class="gain-row"
+                type="button"
+                data-action="focus-routine-exercise"
+                data-exercise-id="${escapeAttribute(item.id)}"
+                aria-label="Ir a ${escapeAttribute(item.name)} en Rutina"
+              >
                 <div class="gain-row-head">
                   <span>${escapeHtml(item.name)}</span>
                   <strong>${escapeHtml(formatSignedKg(item.gainedKg))}</strong>
                 </div>
                 <p class="gain-group">${escapeHtml(item.groupName)}</p>
-                <div class="gain-track" style="--value: ${value};"><span></span></div>
+                <div class="gain-track" style="--value: ${item.progress};"><span></span></div>
                 <p class="gain-meta">${escapeHtml(formatKg(item.initialKg))} -> ${escapeHtml(formatKg(item.currentKg))}</p>
-              </div>
+              </button>
             `;
           })
           .join("")}
@@ -580,7 +586,7 @@
       <nav class="bottom-nav" aria-label="Navegacion principal">
         ${renderNavButton(currentTab, "routine", renderRoutineIcon(), "Rutina")}
         ${renderNavButton(currentTab, "progress", renderChecklistIcon(), "Progreso")}
-        ${renderNavButton(currentTab, "settings", "⚙", "Ajustes")}
+        ${renderNavButton(currentTab, "settings", renderSettingsIcon(), "Ajustes")}
       </nav>
     `;
   }
@@ -609,6 +615,15 @@
         <path d="M13.5 13.3h3.3" />
         <path d="M8 17.6h2.8" />
         <path d="M13.5 17.6h3.3" />
+      </svg>
+    `;
+  }
+
+  function renderSettingsIcon() {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 3.2l1.2 2.1 2.4.6.5 2.4 1.9 1.5-1 2.2 1 2.2-1.9 1.5-.5 2.4-2.4.6-1.2 2.1-1.2-2.1-2.4-.6-.5-2.4L6 14.2l1-2.2-1-2.2 1.9-1.5.5-2.4 2.4-.6L12 3.2z" />
+        <circle cx="12" cy="12" r="3.1" />
       </svg>
     `;
   }

@@ -35,12 +35,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=47`
+  - `styles.css?v=58`
   - `data.js?v=34`
-  - `ui.js?v=43`
-  - `app.js?v=40`
+  - `ui.js?v=54`
+  - `app.js?v=48`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v50"`
+  - `CACHE_NAME = "gym-progress-v63"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -124,9 +124,12 @@ Tras cambios en JS/CSS:
 - La tarjeta superior ya no muestra el texto `Resumen de carga` ni el resumen de Kg activos; usa ese espacio para temporizadores grandes.
 - La tarjeta superior incluye solo cuatro temporizadores de descanso, por defecto `00:30`, `01:00`, `01:30` y `02:00`. No debe haber boton `+` ni temporizadores extra visibles.
 - Al pulsar un temporizador empieza a contar directamente; si se vuelve a pulsar mientras cuenta, se para y vuelve a mostrar su tiempo normal.
-- Al llegar a `00:00`, el temporizador se queda mostrando `00:00` y la pantalla parpadea 10 veces. El parpadeo se corta antes si el usuario pulsa la pantalla.
+- Al llegar a `00:00`, el temporizador se queda mostrando `00:00`, la pantalla parpadea 60 veces y suena el audio de `assets/sounds/` en bucle mientras dure el parpadeo. El parpadeo y el sonido se cortan antes si el usuario pulsa la pantalla, y el temporizador vuelve a mostrar su tiempo original.
 - Al mantener pulsado un temporizador, se abre la edicion de ese temporizador; si estaba contando, primero se para. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
 - La tarjeta superior de temporizadores no debe mostrar las cajas de metricas `Listos para subir` ni `Bloques musculares`.
+- En `Progreso`, la tarjeta `Progreso por ejercicio` muestra registros por ejercicio con grupo/subgrupo, barra con la misma logica porcentual que las barras de ejercicios y filas clicables.
+- Al pulsar un registro de `Progreso por ejercicio`, la app cambia a `Rutina`, despliega el grupo/subgrupo correspondiente y centra ese ejercicio sin abrir el modal.
+- La navegacion inferior usa iconos SVG para `Rutina`, `Progreso` y `Ajustes`.
 
 ## Problemas que hubo antes con el preview
 

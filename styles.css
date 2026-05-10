@@ -715,6 +715,12 @@ body.is-touch-drag-active {
   touch-action: none;
 }
 
+.exercise-card.is-focus-target {
+  outline: 2px solid rgba(185, 244, 74, 0.72);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 6px rgba(139, 232, 78, 0.1), 0 22px 45px rgba(0, 0, 0, 0.42);
+}
+
 .exercise-card.is-drop-before {
   box-shadow: inset 0 3px 0 var(--accent);
 }
@@ -981,6 +987,8 @@ body.is-touch-drag-active {
 }
 
 .gain-card .chart-card {
+  margin-inline: -14px;
+  padding: 10px 6px 10px 8px;
   background: rgba(5, 8, 9, 0.55);
   border-color: rgba(142, 164, 168, 0.16);
 }
@@ -1028,23 +1036,34 @@ body.is-touch-drag-active {
 
 .gain-chart {
   display: grid;
-  gap: 16px;
+  justify-items: center;
+  gap: 14px;
   max-height: 420px;
   overflow-y: auto;
-  padding-right: 6px;
+  padding: 8px 4px 8px 0;
   scrollbar-color: rgba(185, 244, 74, 0.46) rgba(255, 255, 255, 0.06);
 }
 
 .gain-row {
+  width: min(100%, 420px);
   display: grid;
   gap: 8px;
   padding: 14px;
   border: 1px solid rgba(142, 164, 168, 0.16);
   border-radius: 18px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   background:
     linear-gradient(145deg, rgba(18, 27, 30, 0.74), rgba(7, 10, 12, 0.82)),
     linear-gradient(180deg, rgba(139, 232, 78, 0.028), transparent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+
+.gain-row:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 3px;
 }
 
 .gain-row-head {
