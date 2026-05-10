@@ -11,7 +11,6 @@
     groupLabel,
     totalTrackedKg,
     completionRatio,
-    topProgressExercises,
     recentEntries,
     isWeightHistoryEntry,
     formatKg,
@@ -74,46 +73,21 @@
   }
 
   function renderProgressPage(state) {
-    const featured = topProgressExercises(state.storage, 1)[0];
-    const items = topProgressExercises(state.storage, 5);
-
     return `
-      <section class="hero">
+      <section class="hero progress-hero">
         <div>
           <span class="eyebrow">Progreso</span>
-          <h1 class="hero-title">Historico y foco en la siguiente subida.</h1>
-          <p class="hero-copy">
-            Se mantiene el enfoque de la app: porcentaje de ejercicios listos, ejercicio destacado y una vista rapida de cuanto falta para cada objetivo.
-          </p>
+          <h1 class="hero-title">Historial & Progreso</h1>
         </div>
-        <article class="glass-card" style="--glow: rgba(255, 217, 92, 0.12);">
-          <div class="card-body">
-            <p class="section-copy">Vista general</p>
-            <div class="summary-weight">${Math.round(completionRatio(state.storage) * 100)}%</div>
-            <p class="card-copy">de tus ejercicios estan marcados como listos para subir</p>
-            <div class="card-grid metrics">
-              ${renderMetricPill("Entradas en historial", String(recentEntries(state.storage, state.storage.entries.length).length), "var(--accent-strong)")}
-              ${renderMetricPill("Peso activo total", formatKgCompact(totalTrackedKg(state.storage)), "var(--accent-warm)")}
-            </div>
-          </div>
-        </article>
       </section>
 
       <section class="progress-grid">
         <div>
-          ${featured ? renderFeaturedProgress(state, featured) : renderEmptyState("Sin datos suficientes.", "Crea o edita ejercicios para empezar a ver el progreso historico.")}
-          <article class="glass-card progress-card" style="--glow: rgba(255, 217, 92, 0.08);">
-            <div class="card-body">
-              <h2 class="card-title">Top de progreso</h2>
-              <p class="section-copy">Cuanto te falta para el siguiente objetivo en tus ejercicios con mayor salto.</p>
-              <div class="rank-list" style="margin-top: 18px;">
-                ${items.length ? items.map(renderProgressRank).join("") : renderEmptyState("No hay ejercicios todavia.", "Anade el primero desde la pestana Rutina.")}
-              </div>
-            </div>
-          </article>
+          ${renderProgressGainCard(state)}
         </div>
         <div>
           ${renderHistoryPanel(state)}
+          ${renderOverviewCard(state)}
         </div>
       </section>
     `;
@@ -328,33 +302,30 @@
     `;
   }
 
-  function renderFeaturedProgress(state, exercise) {
+  function renderProgressGainCard(state) {
+    const items = progressGainItems(state.storage);
+
     return `
       <article class="glass-card featured-card" style="--glow: rgba(139, 232, 78, 0.08);">
         <div class="card-body">
-          <h2 class="card-title">${escapeHtml(exercise.name)}</h2>
-          <p class="summary-weight" style="font-size: clamp(1.8rem, 4vw, 2.6rem); margin-top: 8px;">
-            ${formatKg(exercise.currentKg)} -> ${formatKg(exercise.nextKg)}
-          </p>
-          <div class="chart-card">${renderExerciseChart(state.storage, exercise.id)}</div>
+          <h2 class="card-title">Progreso por ejercicio</h2>
+          <p class="section-copy">Kg ganados desde el peso inicial en ejercicios que ya han subido.</p>
+          <div class="chart-card">${renderProgressGainChart(items)}</div>
         </div>
       </article>
     `;
   }
 
-  function renderProgressRank(exercise) {
-    const remaining = exercise.nextKg - exercise.currentKg;
-
+  function renderOverviewCard(state) {
     return `
-      <article class="glass-card" style="--glow: rgba(255, 217, 92, 0.06);">
-        <div class="card-body progress-rank">
-          <div class="rank-meta">
-            <h3 class="exercise-title">${escapeHtml(exercise.name)}</h3>
-            <p class="card-copy">${formatKg(exercise.currentKg)} -> ${formatKg(exercise.nextKg)}</p>
-          </div>
-          <div class="rank-gap">
-            <strong>${formatKgCompact(remaining)} Kg</strong>
-            <span class="muted">hasta el siguiente</span>
+      <article class="glass-card progress-card overview-card" style="--glow: rgba(255, 217, 92, 0.12);">
+        <div class="card-body">
+          <p class="section-copy">Vista general</p>
+          <div class="summary-weight">${Math.round(completionRatio(state.storage) * 100)}%</div>
+          <p class="card-copy">de tus ejercicios estan marcados como listos para subir</p>
+          <div class="card-grid metrics">
+            ${renderMetricPill("Entradas en historial", String(recentEntries(state.storage, state.storage.entries.length).length), "var(--accent-strong)")}
+            ${renderMetricPill("Peso activo total", formatKgCompact(totalTrackedKg(state.storage)), "var(--accent-warm)")}
           </div>
         </div>
       </article>
@@ -417,6 +388,52 @@
       default:
         return "Cambio registrado";
     }
+  }
+
+  function progressGainItems(storage) {
+    return [...storage.exercises]
+      .filter((exercise) => !exercise.isSeparated)
+      .map((exercise) => {
+        const initialKg = Number(exercise.initialKg ?? exercise.currentKg ?? 0);
+        const currentKg = Number(exercise.currentKg ?? 0);
+        return {
+          id: exercise.id,
+          name: exercise.name,
+          initialKg,
+          currentKg,
+          gainedKg: Math.max(0, currentKg - initialKg),
+        };
+      })
+      .filter((exercise) => exercise.gainedKg > 0)
+      .sort((a, b) => b.gainedKg - a.gainedKg || a.name.localeCompare(b.name, "es"));
+  }
+
+  function renderProgressGainChart(items) {
+    if (!items.length) {
+      return renderEmptyState("Todavia no hay subidas registradas.", "Cuando un ejercicio supere su peso inicial, aparecera aqui.");
+    }
+
+    const maxGain = Math.max(...items.map((item) => item.gainedKg));
+
+    return `
+      <div class="gain-chart" role="img" aria-label="Grafica de kilos ganados por ejercicio">
+        ${items
+          .map((item) => {
+            const value = maxGain > 0 ? clamp(item.gainedKg / maxGain, 0, 1) : 0;
+            return `
+              <div class="gain-row">
+                <div class="gain-row-head">
+                  <span>${escapeHtml(item.name)}</span>
+                  <strong>${escapeHtml(formatSignedKg(item.gainedKg))}</strong>
+                </div>
+                <div class="gain-track" style="--value: ${value};"><span></span></div>
+                <p class="gain-meta">${escapeHtml(formatKg(item.initialKg))} -> ${escapeHtml(formatKg(item.currentKg))}</p>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    `;
   }
 
   function renderExerciseChart(storage, exerciseId) {

@@ -21,8 +21,17 @@
   const REST_TIMER_SLOTS_KEY = "gym_rest_timer_slots_v1";
   const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
-  const TIMER_FLASH_COUNT = 30;
+  const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
+  const TIMER_SOUND_REPEAT_DELAY_MS = 400;
+  const TIMER_SOUND_SOURCES = [
+    "./assets/sounds/timer-complete.mp3",
+    "./assets/sounds/timer-complete.wav",
+    "./assets/sounds/timer-complete.ogg",
+    "./assets/sounds/timer.mp3",
+    "./assets/sounds/timer.wav",
+    "./assets/sounds/timer.ogg",
+  ];
 
   const state = {
     currentTab: "routine",
@@ -55,6 +64,12 @@
 
   const app = document.querySelector("#app");
   let restTimerInterval = null;
+  let timerCompleteAudio = null;
+  let timerSoundPrimed = false;
+  let timerSoundActive = false;
+  let timerSoundPlayCount = 0;
+  let timerSoundRunId = 0;
+  let timerSoundDelayTimeout = null;
 
   if (!window.history.state?.gymApp) {
     window.history.replaceState({ gymApp: true }, "", window.location.href);
@@ -151,6 +166,7 @@
     }
 
     stopTimerFlash({ render: false });
+    primeTimerCompleteSound();
     state.restTimer = {
       duration,
       remaining: duration,
@@ -213,6 +229,110 @@
       document.body.classList.add("timer-complete-flash");
       state.timerFlashTimeout = window.setTimeout(stopTimerFlash, TIMER_FLASH_COUNT * TIMER_FLASH_DURATION_MS);
     });
+    playTimerCompleteSound();
+  }
+
+  function getTimerCompleteAudio() {
+    if (timerCompleteAudio) {
+      return timerCompleteAudio;
+    }
+
+    timerCompleteAudio = new Audio();
+    timerCompleteAudio.preload = "auto";
+    TIMER_SOUND_SOURCES.forEach((src) => {
+      const source = document.createElement("source");
+      source.src = src;
+      timerCompleteAudio.appendChild(source);
+    });
+    timerCompleteAudio.addEventListener("ended", handleTimerSoundEnded);
+    return timerCompleteAudio;
+  }
+
+  function primeTimerCompleteSound() {
+    if (timerSoundPrimed) {
+      return;
+    }
+
+    const audio = getTimerCompleteAudio();
+    audio.muted = true;
+    audio.volume = 0;
+    const promise = audio.play();
+    if (!promise) {
+      timerSoundPrimed = true;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = false;
+      audio.volume = 1;
+      return;
+    }
+
+    promise
+      .then(() => {
+        timerSoundPrimed = true;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+        audio.volume = 1;
+      })
+      .catch(() => {
+        audio.muted = false;
+        audio.volume = 1;
+      });
+  }
+
+  function playTimerCompleteSound() {
+    timerSoundRunId += 1;
+    timerSoundPlayCount = 0;
+    timerSoundActive = true;
+    playTimerSoundCycle(timerSoundRunId);
+  }
+
+  function handleTimerSoundEnded() {
+    if (!timerSoundActive) {
+      timerSoundActive = false;
+      return;
+    }
+
+    const runId = timerSoundRunId;
+    timerSoundDelayTimeout = window.setTimeout(() => {
+      timerSoundDelayTimeout = null;
+      playTimerSoundCycle(runId);
+    }, TIMER_SOUND_REPEAT_DELAY_MS);
+  }
+
+  function playTimerSoundCycle(runId) {
+    if (!timerSoundActive || runId !== timerSoundRunId) {
+      return;
+    }
+
+    const audio = getTimerCompleteAudio();
+    audio.pause();
+    audio.currentTime = 0;
+    audio.muted = false;
+    audio.volume = 1;
+    timerSoundPlayCount += 1;
+    const promise = audio.play();
+    if (promise) {
+      promise.catch(() => {
+        timerSoundActive = false;
+      });
+    }
+  }
+
+  function stopTimerCompleteSound() {
+    timerSoundActive = false;
+    timerSoundRunId += 1;
+    timerSoundPlayCount = 0;
+    if (timerSoundDelayTimeout) {
+      window.clearTimeout(timerSoundDelayTimeout);
+      timerSoundDelayTimeout = null;
+    }
+    if (!timerCompleteAudio) {
+      return;
+    }
+
+    timerCompleteAudio.pause();
+    timerCompleteAudio.currentTime = 0;
   }
 
   function stopTimerFlash(options = {}) {
@@ -222,6 +342,7 @@
       !state.restTimer.running && state.restTimer.duration > 0 && (state.restTimer.completed || state.restTimer.remaining <= 0);
 
     document.body.classList.remove("timer-complete-flash");
+    stopTimerCompleteSound();
     if (state.timerFlashTimeout) {
       window.clearTimeout(state.timerFlashTimeout);
       state.timerFlashTimeout = null;

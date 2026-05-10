@@ -280,6 +280,15 @@ code {
   padding: 13px 22px 14px;
 }
 
+.routine-hero > .glass-card {
+  border-color: rgba(142, 164, 168, 0.18);
+  background:
+    linear-gradient(145deg, rgba(18, 27, 30, 0.9), rgba(7, 10, 12, 0.94)),
+    linear-gradient(180deg, rgba(139, 232, 78, 0.035), transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
 .routine-hero .rest-timer-panel {
   gap: 8px 14px;
   margin: 0;
@@ -326,7 +335,7 @@ body.timer-complete-flash::before {
   background:
     radial-gradient(circle at 50% 28%, rgba(185, 244, 74, 0.62), transparent 34%),
     rgba(185, 244, 74, 0.16);
-  animation: timerFlash 360ms ease-in-out 30 both;
+  animation: timerFlash 360ms ease-in-out 60 both;
 }
 
 @keyframes timerFlash {
@@ -993,6 +1002,73 @@ body.is-touch-drag-active {
   stroke-width: 1;
 }
 
+.gain-chart {
+  display: grid;
+  gap: 16px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-color: rgba(185, 244, 74, 0.46) rgba(255, 255, 255, 0.06);
+}
+
+.gain-row {
+  display: grid;
+  gap: 8px;
+}
+
+.gain-row-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.gain-row-head span {
+  min-width: 0;
+  color: var(--text);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.gain-row-head strong {
+  flex: none;
+  color: var(--accent);
+}
+
+.gain-track {
+  height: 14px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: rgba(9, 11, 13, 0.9);
+}
+
+.gain-track span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: max(8px, calc(var(--value, 0) * 100%));
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent) 72%, #d5ff65);
+  box-shadow:
+    0 0 16px rgba(139, 232, 78, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.gain-track span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0 34%, rgba(255, 255, 255, 0.34) 46%, transparent 58%);
+  opacity: 0.5;
+}
+
+.gain-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .progress-rank {
   align-items: center;
   justify-content: space-between;
@@ -1019,8 +1095,20 @@ body.is-touch-drag-active {
   margin-top: 16px;
 }
 
+.overview-card {
+  margin-top: 16px;
+}
+
 .progress-grid > div > .history-section:first-child {
   margin-top: 0;
+}
+
+.progress-hero {
+  margin-bottom: 28px;
+}
+
+.progress-hero .hero-title {
+  margin-top: 18px;
 }
 
 .history-card {
@@ -1220,6 +1308,16 @@ body.is-touch-drag-active {
   color: var(--text);
 }
 
+.field select {
+  appearance: none;
+  padding-right: 58px;
+  background-color: rgba(29, 35, 41, 0.96);
+  background-image: url("data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 2L7 7L12 2' fill='none' stroke='%23f3f5f7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 24px center;
+  background-size: 14px 9px;
+}
+
 .field textarea {
   min-height: 120px;
   resize: vertical;
@@ -1230,6 +1328,36 @@ body.is-touch-drag-active {
 .field textarea:focus {
   border-color: rgba(185, 244, 74, 0.82);
   box-shadow: 0 0 0 3px rgba(185, 244, 74, 0.12);
+}
+
+.field input#exercise-current {
+  border-color: color-mix(in srgb, var(--accent) 34%, rgba(255, 255, 255, 0.1));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 16%, rgba(9, 11, 13, 0.98)),
+    color-mix(in srgb, var(--accent) 8%, rgba(9, 11, 13, 0.98))
+  );
+  color: color-mix(in srgb, var(--accent) 84%, var(--text));
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.field input#exercise-current:focus {
+  border-color: rgba(185, 244, 74, 0.82);
+  box-shadow: 0 0 0 3px rgba(185, 244, 74, 0.14), inset 0 0 0 1px rgba(185, 244, 74, 0.22);
+}
+
+.field input#exercise-next {
+  border-color: rgba(218, 139, 34, 0.42);
+  background: linear-gradient(135deg, rgba(88, 55, 15, 0.72), rgba(32, 23, 13, 0.96));
+  color: #ffd26a;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(255, 183, 72, 0.12);
+}
+
+.field input#exercise-next:focus {
+  border-color: rgba(255, 190, 76, 0.78);
+  box-shadow: 0 0 0 3px rgba(255, 170, 43, 0.14), inset 0 0 0 1px rgba(255, 190, 76, 0.2);
 }
 
 .switch {
