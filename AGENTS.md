@@ -45,12 +45,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=63`
+  - `styles.css?v=65`
   - `data.js?v=34`
-  - `ui.js?v=59`
+  - `ui.js?v=61`
   - `app.js?v=50`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v71"`
+  - `CACHE_NAME = "gym-progress-v73"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -147,6 +147,9 @@ Tras cambios en JS/CSS:
 - En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
 - Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
 - `Ajustes` incluye una tarjeta `Datos en la nube` con botones `Configurar carpeta`, `Guardar en GitHub` y `Cargar desde GitHub`.
+- El hero de `Ajustes` usa el titulo literal `Ajustes`, con la misma separacion entre eyebrow y titulo que el hero de `Progreso`.
+- El texto del hero de `Ajustes` es `Datos Locales, Copia en la nube & Restauracion de Rutina.`
+- En las tarjetas de `Ajustes`, el contenido queda ligeramente subido para verse mas centrado visualmente.
 - La nube debe guardar/cargar toda la rutina: grupos, subgrupos, ejercicios, pesos actuales/iniciales/siguiente subida, historial y temporizadores.
 - La configuracion de GitHub se introduce en un modal y se conserva localmente. Tratar el token como dato sensible: no imprimirlo en logs ni documentarlo en texto visible.
 

@@ -404,6 +404,10 @@ body.timer-complete-flash::before {
   max-width: 100%;
 }
 
+.settings-card .card-body {
+  transform: translateY(-6px);
+}
+
 .group-shell {
   width: 100%;
   max-width: 100%;
@@ -1180,6 +1184,10 @@ body.is-touch-drag-active {
 }
 
 .progress-hero .hero-title {
+  margin-top: 18px;
+}
+
+.settings-hero .hero-title {
   margin-top: 18px;
 }
 

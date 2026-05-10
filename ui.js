@@ -98,12 +98,12 @@
     const cloudTarget = cloud.owner && cloud.repo ? `${cloud.owner}/${cloud.repo}/${cloud.path || ""}` : "Sin configurar";
 
     return `
-      <section class="hero">
+      <section class="hero settings-hero">
         <div>
           <span class="eyebrow">Ajustes</span>
-          <h1 class="hero-title">Control simple para una primera version limpia.</h1>
+          <h1 class="hero-title">Ajustes</h1>
           <p class="hero-copy">
-            Igual que en la app original, la web guarda los datos solo en local y permite restaurar la plantilla inicial cuando quieras.
+            Datos Locales, Copia en la nube & Restauracion de Rutina.
           </p>
         </div>
       </section>
