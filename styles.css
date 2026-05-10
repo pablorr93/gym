@@ -961,6 +961,30 @@ body.is-touch-drag-active {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.gain-card {
+  border-color: rgba(142, 164, 168, 0.18);
+  background:
+    linear-gradient(145deg, rgba(18, 27, 30, 0.9), rgba(7, 10, 12, 0.94)),
+    linear-gradient(180deg, rgba(139, 232, 78, 0.035), transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.gain-card .card-title,
+.gain-card .section-copy {
+  text-align: center;
+}
+
+.gain-card .section-copy {
+  max-width: 30ch;
+  margin-inline: auto;
+}
+
+.gain-card .chart-card {
+  background: rgba(5, 8, 9, 0.55);
+  border-color: rgba(142, 164, 168, 0.16);
+}
+
 .chart-wrap {
   width: 100%;
   overflow-x: auto;
@@ -1014,6 +1038,13 @@ body.is-touch-drag-active {
 .gain-row {
   display: grid;
   gap: 8px;
+  padding: 14px;
+  border: 1px solid rgba(142, 164, 168, 0.16);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(18, 27, 30, 0.74), rgba(7, 10, 12, 0.82)),
+    linear-gradient(180deg, rgba(139, 232, 78, 0.028), transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 .gain-row-head {
@@ -1034,6 +1065,15 @@ body.is-touch-drag-active {
 .gain-row-head strong {
   flex: none;
   color: var(--accent);
+}
+
+.gain-group {
+  margin: -2px 0 0;
+  color: color-mix(in srgb, var(--accent) 68%, var(--muted));
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .gain-track {
@@ -1221,6 +1261,28 @@ body.is-touch-drag-active {
   display: block;
   margin-bottom: 6px;
   font-size: 1.25rem;
+  line-height: 1;
+}
+
+.nav-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  margin-inline: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-button[data-tab="settings"] .nav-icon {
+  font-size: 1.22rem;
+}
+
+.nav-button[data-tab="routine"] .nav-icon,
+.nav-button[data-tab="progress"] .nav-icon {
+  font-size: 1.16rem;
 }
 
 .nav-label {

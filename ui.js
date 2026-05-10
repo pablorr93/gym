@@ -306,7 +306,7 @@
     const items = progressGainItems(state.storage);
 
     return `
-      <article class="glass-card featured-card" style="--glow: rgba(139, 232, 78, 0.08);">
+      <article class="glass-card featured-card gain-card" style="--glow: rgba(139, 232, 78, 0.08);">
         <div class="card-body">
           <h2 class="card-title">Progreso por ejercicio</h2>
           <p class="section-copy">Kg ganados desde el peso inicial en ejercicios que ya han subido.</p>
@@ -399,6 +399,7 @@
         return {
           id: exercise.id,
           name: exercise.name,
+          groupName: groupLabel(storage, findGroup(storage, exercise.groupId) || { name: "Sin grupo" }),
           initialKg,
           currentKg,
           gainedKg: Math.max(0, currentKg - initialKg),
@@ -426,6 +427,7 @@
                   <span>${escapeHtml(item.name)}</span>
                   <strong>${escapeHtml(formatSignedKg(item.gainedKg))}</strong>
                 </div>
+                <p class="gain-group">${escapeHtml(item.groupName)}</p>
                 <div class="gain-track" style="--value: ${value};"><span></span></div>
                 <p class="gain-meta">${escapeHtml(formatKg(item.initialKg))} -> ${escapeHtml(formatKg(item.currentKg))}</p>
               </div>
@@ -576,10 +578,38 @@
   function renderBottomNav(currentTab) {
     return `
       <nav class="bottom-nav" aria-label="Navegacion principal">
-        ${renderNavButton(currentTab, "routine", "R", "Rutina")}
-        ${renderNavButton(currentTab, "progress", "P", "Progreso")}
-        ${renderNavButton(currentTab, "settings", "A", "Ajustes")}
+        ${renderNavButton(currentTab, "routine", renderRoutineIcon(), "Rutina")}
+        ${renderNavButton(currentTab, "progress", renderChecklistIcon(), "Progreso")}
+        ${renderNavButton(currentTab, "settings", "⚙", "Ajustes")}
       </nav>
+    `;
+  }
+
+  function renderRoutineIcon() {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 9.2v5.6" />
+        <path d="M6 7.5v9" />
+        <path d="M9 10.5v3" />
+        <path d="M9 12h6" />
+        <path d="M15 10.5v3" />
+        <path d="M18 7.5v9" />
+        <path d="M21 9.2v5.6" />
+      </svg>
+    `;
+  }
+
+  function renderChecklistIcon() {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="4" y="3.8" width="16" height="16.8" rx="3" />
+        <path d="M8 8.2l1.3 1.3 2.5-2.7" />
+        <path d="M13.5 8.5h3.3" />
+        <path d="M8 13l1.3 1.3 2.5-2.7" />
+        <path d="M13.5 13.3h3.3" />
+        <path d="M8 17.6h2.8" />
+        <path d="M13.5 17.6h3.3" />
+      </svg>
     `;
   }
 

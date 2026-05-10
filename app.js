@@ -23,7 +23,7 @@
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
-  const TIMER_SOUND_REPEAT_DELAY_MS = 400;
+  const TIMER_SOUND_REPEAT_DELAY_MS = 300;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
     "./assets/sounds/timer-complete.wav",
