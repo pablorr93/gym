@@ -431,9 +431,23 @@ body.timer-complete-flash::before {
   outline-offset: 0;
 }
 
-.group-shell.is-group-drop-before {
-  box-shadow: inset 0 3px 0 var(--accent);
+.group-shell.is-group-drop-before,
+.group-shell.is-group-drop-after {
   border-radius: var(--radius-xl);
+}
+
+.group-shell.is-group-drop-before > .group-card {
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+
+.group-shell.is-group-drop-after > .group-card {
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.group-shell.is-group-drop-before > .group-card,
+.group-shell.is-group-drop-after > .group-card {
+  border-radius: var(--radius-xl);
+  border-color: rgba(185, 244, 74, 0.34);
 }
 
 .section-stack.is-over,

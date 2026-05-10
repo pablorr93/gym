@@ -1225,6 +1225,7 @@
       container,
       targetParentId,
       beforeGroup,
+      afterGroup: beforeGroup ? null : groupShells[groupShells.length - 1] || null,
       beforeGroupId: beforeGroup?.dataset.dragGroupId || null,
     };
   }
@@ -1248,6 +1249,8 @@
       placement.container.classList.add("is-over");
       if (placement.beforeGroup) {
         placement.beforeGroup.classList.add("is-group-drop-before");
+      } else if (placement.afterGroup) {
+        placement.afterGroup.classList.add("is-group-drop-after");
       } else {
         placement.container.classList.add("is-group-drop-end");
       }
@@ -1271,8 +1274,8 @@
       section.classList.remove("is-over", "is-group-drop-end");
     });
     document.querySelectorAll(".exercise-card.is-drop-before").forEach((card) => card.classList.remove("is-drop-before"));
-    document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-exercise-drop-target").forEach((group) => {
-      group.classList.remove("is-group-drop-before", "is-exercise-drop-target");
+    document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-group-drop-after, .group-shell.is-exercise-drop-target").forEach((group) => {
+      group.classList.remove("is-group-drop-before", "is-group-drop-after", "is-exercise-drop-target");
     });
   }
 
