@@ -40,7 +40,7 @@
       case "progress":
         return renderProgressPage(state);
       case "settings":
-        return renderSettingsPage();
+        return renderSettingsPage(state);
       case "routine":
       default:
         return renderRoutinePage(state);
@@ -93,7 +93,10 @@
     `;
   }
 
-  function renderSettingsPage() {
+  function renderSettingsPage(state) {
+    const cloud = state.cloudConfig || {};
+    const cloudTarget = cloud.owner && cloud.repo ? `${cloud.owner}/${cloud.repo}/${cloud.path || ""}` : "Sin configurar";
+
     return `
       <section class="hero">
         <div>
@@ -110,6 +113,18 @@
           <div class="card-body">
             <h2 class="card-title">Datos locales</h2>
             <p class="card-copy">Tus ejercicios, pesos e historico se guardan solo en este navegador mediante <code>localStorage</code>.</p>
+          </div>
+        </article>
+        <article class="glass-card settings-card" style="--glow: rgba(139, 232, 78, 0.1);">
+          <div class="card-body">
+            <h2 class="card-title">Datos en la nube</h2>
+            <p class="card-copy">Guarda grupos, subgrupos, ejercicios, pesos, historial y temporizadores en una carpeta de GitHub.</p>
+            <p class="cloud-target">${escapeHtml(cloudTarget)}</p>
+            <div class="page-actions cloud-actions">
+              <button class="ghost-button" data-action="open-cloud-settings">Configurar carpeta</button>
+              <button class="primary-button" data-action="cloud-save">Guardar en GitHub</button>
+              <button class="ghost-button" data-action="cloud-load">Cargar desde GitHub</button>
+            </div>
           </div>
         </article>
         <article class="glass-card settings-card" style="--glow: rgba(255, 217, 92, 0.08);">
@@ -622,8 +637,16 @@
   function renderSettingsIcon() {
     return `
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M12 3.2l1.2 2.1 2.4.6.5 2.4 1.9 1.5-1 2.2 1 2.2-1.9 1.5-.5 2.4-2.4.6-1.2 2.1-1.2-2.1-2.4-.6-.5-2.4L6 14.2l1-2.2-1-2.2 1.9-1.5.5-2.4 2.4-.6L12 3.2z" />
-        <circle cx="12" cy="12" r="3.1" />
+        <circle cx="12" cy="12" r="2.55" />
+        <circle cx="12" cy="12" r="5.7" />
+        <path d="M12 4.9v1.4" />
+        <path d="M12 17.7v1.4" />
+        <path d="M4.9 12h1.4" />
+        <path d="M17.7 12h1.4" />
+        <path d="m7 7 1 1" />
+        <path d="m16 16 1 1" />
+        <path d="m17 7-1 1" />
+        <path d="m8 16-1 1" />
       </svg>
     `;
   }
@@ -664,6 +687,8 @@
         return renderApplyNextModal(state);
       case "rest-timer-editor":
         return renderRestTimerModal(state);
+      case "cloud-settings":
+        return renderCloudSettingsModal(state);
       default:
         return "";
     }
@@ -845,6 +870,49 @@
         </div>
         <div class="modal-actions">
           <button class="primary-button" type="submit">Guardar cambio</button>
+        </div>
+      </form>
+    `;
+  }
+
+  function renderCloudSettingsModal(state) {
+    const cloud = state.cloudConfig || {};
+
+    return `
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Carpeta de GitHub</h2>
+          <p class="section-copy">Usa un token de GitHub con permiso de contenido para guardar y cargar la copia.</p>
+        </div>
+        <button class="icon-button" data-action="close-modal" aria-label="Cerrar modal">x</button>
+      </div>
+      <form class="modal-form" data-form="cloud-settings">
+        <div class="form-row cols-2">
+          <div class="field">
+            <label for="cloud-owner">Usuario u organizacion</label>
+            <input id="cloud-owner" name="owner" type="text" value="${escapeAttribute(cloud.owner || "")}" placeholder="tu-usuario" required />
+          </div>
+          <div class="field">
+            <label for="cloud-repo">Repositorio</label>
+            <input id="cloud-repo" name="repo" type="text" value="${escapeAttribute(cloud.repo || "")}" placeholder="rutina-gym" required />
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="field">
+            <label for="cloud-branch">Rama</label>
+            <input id="cloud-branch" name="branch" type="text" value="${escapeAttribute(cloud.branch || "main")}" required />
+          </div>
+          <div class="field">
+            <label for="cloud-path">Carpeta</label>
+            <input id="cloud-path" name="path" type="text" value="${escapeAttribute(cloud.path || "gym-progress")}" placeholder="gym-progress" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="cloud-token">Token de GitHub</label>
+          <input id="cloud-token" name="token" type="password" value="${escapeAttribute(cloud.token || "")}" autocomplete="off" required />
+        </div>
+        <div class="modal-actions">
+          <button class="primary-button" type="submit">Guardar configuracion</button>
         </div>
       </form>
     `;

@@ -20,6 +20,8 @@
 
   const REST_TIMER_SLOTS_KEY = "gym_rest_timer_slots_v1";
   const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
+  const GITHUB_CLOUD_KEY = "gym_github_cloud_v1";
+  const GITHUB_CLOUD_FILE = "gym-progress-cloud.json";
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
@@ -53,6 +55,12 @@
     timerFlashTimeout: null,
     suppressClickUntil: 0,
     modalHistoryActive: false,
+    cloudConfig: loadGithubCloudConfig(),
+    tabScroll: {
+      routine: { page: 0, hasSaved: false },
+      progress: { page: 0, gain: 0, history: 0, hasSaved: false },
+      settings: { page: 0, hasSaved: false },
+    },
     restTimer: {
       duration: 0,
       remaining: 0,
@@ -77,6 +85,49 @@
 
   function render() {
     app.innerHTML = window.GymUI.renderApp(state);
+  }
+
+  function saveCurrentTabViewState() {
+    const pageScroller = document.scrollingElement || document.documentElement;
+    const current = state.currentTab;
+
+    if (!state.tabScroll[current]) {
+      return;
+    }
+
+    state.tabScroll[current] = {
+      ...state.tabScroll[current],
+      page: pageScroller.scrollTop,
+      hasSaved: true,
+    };
+
+    if (current === "progress") {
+      state.tabScroll.progress.gain = document.querySelector(".gain-chart")?.scrollTop || 0;
+      state.tabScroll.progress.history = document.querySelector(".history-list")?.scrollTop || 0;
+    }
+  }
+
+  function restoreCurrentTabViewState() {
+    const saved = state.tabScroll[state.currentTab];
+    if (!saved?.hasSaved) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      const pageScroller = document.scrollingElement || document.documentElement;
+
+      pageScroller.scrollTop = saved.page;
+      if (state.currentTab === "progress") {
+        const gainList = document.querySelector(".gain-chart");
+        const historyList = document.querySelector(".history-list");
+        if (gainList) {
+          gainList.scrollTop = saved.gain || 0;
+        }
+        if (historyList) {
+          historyList.scrollTop = saved.history || 0;
+        }
+      }
+    });
   }
 
   function persist(storage) {
@@ -173,6 +224,155 @@
       const seconds = Math.floor(Number(source[index]) || 0);
       return seconds > 0 && seconds <= 5999 ? seconds : fallback;
     });
+  }
+
+  function loadGithubCloudConfig() {
+    try {
+      const raw = window.localStorage.getItem(GITHUB_CLOUD_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return {
+        owner: String(parsed.owner || ""),
+        repo: String(parsed.repo || ""),
+        branch: String(parsed.branch || "main"),
+        path: String(parsed.path || "gym-progress"),
+        token: String(parsed.token || ""),
+      };
+    } catch (error) {
+      return { owner: "", repo: "", branch: "main", path: "gym-progress", token: "" };
+    }
+  }
+
+  function saveGithubCloudConfig(config) {
+    state.cloudConfig = {
+      owner: config.owner.trim(),
+      repo: config.repo.trim(),
+      branch: config.branch.trim() || "main",
+      path: normalizeGithubPath(config.path),
+      token: config.token.trim(),
+    };
+    window.localStorage.setItem(GITHUB_CLOUD_KEY, JSON.stringify(state.cloudConfig));
+  }
+
+  function normalizeGithubPath(path) {
+    return String(path || "gym-progress")
+      .trim()
+      .replace(/^\/+|\/+$/g, "")
+      .replace(/\/+/g, "/");
+  }
+
+  function githubCloudReady() {
+    const { owner, repo, branch, path, token } = state.cloudConfig;
+    return Boolean(owner && repo && branch && path && token);
+  }
+
+  function githubCloudApiUrl() {
+    const { owner, repo, path } = state.cloudConfig;
+    const filePath = `${normalizeGithubPath(path)}/${GITHUB_CLOUD_FILE}`;
+    const encodedPath = filePath.split("/").map(encodeURIComponent).join("/");
+    return `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodedPath}`;
+  }
+
+  function textToBase64(text) {
+    const bytes = new TextEncoder().encode(text);
+    let binary = "";
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    return window.btoa(binary);
+  }
+
+  function base64ToText(base64) {
+    const binary = window.atob(base64.replace(/\s/g, ""));
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  async function githubRequest(url, options = {}) {
+    const response = await window.fetch(url, {
+      ...options,
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${state.cloudConfig.token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(options.headers || {}),
+      },
+    });
+
+    if (!response.ok && response.status !== 404) {
+      const details = await response.text();
+      throw new Error(details || `GitHub respondio con estado ${response.status}.`);
+    }
+
+    return response;
+  }
+
+  function cloudExportPayload() {
+    return {
+      app: "gym-progress-web",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      storage: state.storage,
+      restTimers: state.restTimers,
+    };
+  }
+
+  async function saveCloudBackup() {
+    if (!githubCloudReady()) {
+      window.alert("Configura primero la carpeta de GitHub.");
+      openModal({ type: "cloud-settings" });
+      return;
+    }
+
+    const url = `${githubCloudApiUrl()}?ref=${encodeURIComponent(state.cloudConfig.branch)}`;
+    const existing = await githubRequest(url);
+    const existingJson = existing.status === 404 ? null : await existing.json();
+    const body = {
+      message: "Guardar copia de Gym Progress",
+      branch: state.cloudConfig.branch,
+      content: textToBase64(JSON.stringify(cloudExportPayload(), null, 2)),
+      ...(existingJson?.sha ? { sha: existingJson.sha } : {}),
+    };
+
+    await githubRequest(githubCloudApiUrl(), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    window.alert("Datos guardados en GitHub.");
+  }
+
+  async function loadCloudBackup() {
+    if (!githubCloudReady()) {
+      window.alert("Configura primero la carpeta de GitHub.");
+      openModal({ type: "cloud-settings" });
+      return;
+    }
+
+    if (!confirmAction("Se cargara la copia de GitHub y sustituira los datos locales actuales. Continuar?")) {
+      return;
+    }
+
+    const response = await githubRequest(`${githubCloudApiUrl()}?ref=${encodeURIComponent(state.cloudConfig.branch)}`);
+    if (response.status === 404) {
+      window.alert("No se encontro ninguna copia en esa carpeta.");
+      return;
+    }
+
+    const file = await response.json();
+    const payload = JSON.parse(base64ToText(file.content || ""));
+    if (!payload.storage || !Array.isArray(payload.storage.groups) || !Array.isArray(payload.storage.exercises)) {
+      window.alert("El archivo de GitHub no parece ser una copia valida de Gym Progress.");
+      return;
+    }
+
+    state.storage = payload.storage;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.storage));
+    if (Array.isArray(payload.restTimers)) {
+      state.restTimers = normalizeRestTimerSlots(payload.restTimers);
+      window.localStorage.setItem(REST_TIMER_SLOTS_KEY, JSON.stringify(state.restTimers));
+    }
+    render();
+    window.alert("Datos cargados desde GitHub.");
   }
 
   function parseTimerInput(value) {
@@ -454,17 +654,25 @@
     const { action } = actionEl.dataset;
 
     switch (action) {
-      case "switch-tab":
-        state.currentTab = actionEl.dataset.tab;
+      case "switch-tab": {
+        const nextTab = actionEl.dataset.tab;
+        if (nextTab === state.currentTab) {
+          return;
+        }
+        saveCurrentTabViewState();
+        state.currentTab = nextTab;
         state.openGroupMenuId = null;
         render();
+        restoreCurrentTabViewState();
         break;
+      }
       case "focus-routine-exercise": {
         event.stopPropagation();
         const exercise = findExercise(state.storage, actionEl.dataset.exerciseId);
         if (!exercise) {
           return;
         }
+        saveCurrentTabViewState();
         state.currentTab = "routine";
         state.modal = null;
         state.openGroupMenuId = null;
@@ -534,6 +742,22 @@
       case "open-apply-next":
         state.openGroupMenuId = null;
         openModal({ type: "apply-next", exerciseId: actionEl.dataset.exerciseId });
+        break;
+      case "open-cloud-settings":
+        state.openGroupMenuId = null;
+        openModal({ type: "cloud-settings" });
+        break;
+      case "cloud-save":
+        event.stopPropagation();
+        saveCloudBackup().catch((error) => {
+          window.alert(`No se pudo guardar en GitHub: ${error.message}`);
+        });
+        break;
+      case "cloud-load":
+        event.stopPropagation();
+        loadCloudBackup().catch((error) => {
+          window.alert(`No se pudo cargar desde GitHub: ${error.message}`);
+        });
         break;
       case "delete-exercise":
         if (confirmAction("Se eliminara el ejercicio y todo su historial. Quieres continuar?")) {
@@ -645,6 +869,23 @@
         }
         closeModal();
         saveRestTimerSlot(timerIndex, seconds);
+        break;
+      }
+      case "cloud-settings": {
+        const config = {
+          owner: form.elements.owner.value,
+          repo: form.elements.repo.value,
+          branch: form.elements.branch.value,
+          path: form.elements.path.value,
+          token: form.elements.token.value,
+        };
+        if (!config.owner.trim() || !config.repo.trim() || !config.path.trim() || !config.token.trim()) {
+          window.alert("Completa usuario, repositorio, carpeta y token.");
+          return;
+        }
+        saveGithubCloudConfig(config);
+        closeModal();
+        render();
         break;
       }
       default:

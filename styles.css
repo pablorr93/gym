@@ -233,6 +233,19 @@ code {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.cloud-target {
+  display: inline-flex;
+  max-width: 100%;
+  margin: 6px 0 0;
+  padding: 7px 11px;
+  border-radius: var(--radius-pill);
+  background: rgba(139, 232, 78, 0.08);
+  color: color-mix(in srgb, var(--accent) 82%, var(--text));
+  font-size: 0.86rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 .glass-card {
   position: relative;
   overflow: hidden;
@@ -987,8 +1000,8 @@ body.is-touch-drag-active {
 }
 
 .gain-card .chart-card {
-  margin-inline: -14px;
-  padding: 10px 6px 10px 8px;
+  margin-inline: -10px;
+  padding: 10px 8px 10px 10px;
   background: rgba(5, 8, 9, 0.55);
   border-color: rgba(142, 164, 168, 0.16);
 }
@@ -1223,8 +1236,18 @@ body.is-touch-drag-active {
 
 .page-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: flex-end;
   margin-top: 18px;
+}
+
+.cloud-actions {
+  justify-content: stretch;
+}
+
+.cloud-actions > button {
+  flex: 1 1 150px;
 }
 
 .fab {
@@ -1297,6 +1320,12 @@ body.is-touch-drag-active {
 
 .nav-button[data-tab="settings"] .nav-icon {
   font-size: 1.22rem;
+}
+
+.nav-button[data-tab="settings"] .nav-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.95;
 }
 
 .nav-button[data-tab="routine"] .nav-icon,
