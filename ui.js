@@ -10,8 +10,6 @@
     findExercise,
     groupLabel,
     totalTrackedKg,
-    readyExercisesCount,
-    totalExercisesCount,
     completionRatio,
     topProgressExercises,
     recentEntries,
@@ -65,10 +63,6 @@
         <article class="glass-card" style="--glow: rgba(139, 232, 78, 0.12);">
           <div class="card-body">
             ${renderRestTimers(state)}
-            <div class="card-grid metrics">
-              ${renderMetricPill("Listos para subir", String(readyExercisesCount(state.storage)), "var(--accent-strong)")}
-              ${renderMetricPill("Bloques musculares", String(roots.length), "var(--accent-warm)")}
-            </div>
           </div>
         </article>
       </section>
@@ -516,10 +510,11 @@
         ${timers
           .map((seconds, index) => {
             const isActive = restTimer.running && restTimer.duration === seconds;
-            const label = isActive ? formatTimer(restTimer.remaining) : formatTimer(seconds);
+            const isCompleted = restTimer.completed && restTimer.duration === seconds;
+            const label = isActive || isCompleted ? formatTimer(restTimer.remaining) : formatTimer(seconds);
             return `
               <button
-                class="rest-timer-button ${isActive ? "is-active" : ""}"
+                class="rest-timer-button ${isActive || isCompleted ? "is-active" : ""}"
                 type="button"
                 data-action="start-rest-timer"
                 data-timer-index="${index}"

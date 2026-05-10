@@ -35,12 +35,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=46`
+  - `styles.css?v=47`
   - `data.js?v=34`
-  - `ui.js?v=42`
-  - `app.js?v=39`
+  - `ui.js?v=43`
+  - `app.js?v=40`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v49"`
+  - `CACHE_NAME = "gym-progress-v50"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -124,8 +124,9 @@ Tras cambios en JS/CSS:
 - La tarjeta superior ya no muestra el texto `Resumen de carga` ni el resumen de Kg activos; usa ese espacio para temporizadores grandes.
 - La tarjeta superior incluye solo cuatro temporizadores de descanso, por defecto `00:30`, `01:00`, `01:30` y `02:00`. No debe haber boton `+` ni temporizadores extra visibles.
 - Al pulsar un temporizador empieza a contar directamente; si se vuelve a pulsar mientras cuenta, se para y vuelve a mostrar su tiempo normal.
-- Al llegar a `00:00`, la pantalla hace un destello/parpadeo breve.
-- Al mantener pulsado un temporizador, se abre la edicion de ese temporizador. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
+- Al llegar a `00:00`, el temporizador se queda mostrando `00:00` y la pantalla parpadea 10 veces. El parpadeo se corta antes si el usuario pulsa la pantalla.
+- Al mantener pulsado un temporizador, se abre la edicion de ese temporizador; si estaba contando, primero se para. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
+- La tarjeta superior de temporizadores no debe mostrar las cajas de metricas `Listos para subir` ni `Bloques musculares`.
 
 ## Problemas que hubo antes con el preview
 

@@ -21,6 +21,8 @@
   const REST_TIMER_SLOTS_KEY = "gym_rest_timer_slots_v1";
   const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
+  const TIMER_FLASH_COUNT = 30;
+  const TIMER_FLASH_DURATION_MS = 360;
 
   const state = {
     currentTab: "routine",
@@ -39,6 +41,7 @@
     restTimerPressTimer: null,
     restTimerPressTarget: null,
     suppressTimerClickUntil: 0,
+    timerFlashTimeout: null,
     suppressClickUntil: 0,
     modalHistoryActive: false,
     restTimer: {
@@ -46,6 +49,7 @@
       remaining: 0,
       endsAt: 0,
       running: false,
+      completed: false,
     },
   };
 
@@ -141,27 +145,31 @@
 
   function startRestTimer(seconds) {
     const duration = Math.max(1, Math.floor(Number(seconds) || 0));
-    if (state.restTimer.running && state.restTimer.duration === duration) {
+    if ((state.restTimer.running || state.restTimer.completed) && state.restTimer.duration === duration) {
       stopRestTimer();
       return;
     }
 
+    stopTimerFlash({ render: false });
     state.restTimer = {
       duration,
       remaining: duration,
       endsAt: Date.now() + duration * 1000,
       running: true,
+      completed: false,
     };
     ensureRestTimerInterval();
     render();
   }
 
   function stopRestTimer() {
+    stopTimerFlash({ render: false, resetCompleted: false });
     state.restTimer = {
       duration: 0,
       remaining: 0,
       endsAt: 0,
       running: false,
+      completed: false,
     };
     clearRestTimerInterval();
     render();
@@ -190,6 +198,7 @@
 
     if (remaining <= 0) {
       state.restTimer.running = false;
+      state.restTimer.completed = true;
       clearRestTimerInterval();
       triggerRestTimerComplete();
     }
@@ -198,11 +207,38 @@
   }
 
   function triggerRestTimerComplete() {
+    stopTimerFlash({ render: false, resetCompleted: false });
     document.body.classList.remove("timer-complete-flash");
     window.requestAnimationFrame(() => {
       document.body.classList.add("timer-complete-flash");
-      window.setTimeout(() => document.body.classList.remove("timer-complete-flash"), 1500);
+      state.timerFlashTimeout = window.setTimeout(stopTimerFlash, TIMER_FLASH_COUNT * TIMER_FLASH_DURATION_MS);
     });
+  }
+
+  function stopTimerFlash(options = {}) {
+    const shouldResetCompleted = options.resetCompleted !== false;
+    const shouldRender = options.render !== false;
+    const hasFinishedTimer =
+      !state.restTimer.running && state.restTimer.duration > 0 && (state.restTimer.completed || state.restTimer.remaining <= 0);
+
+    document.body.classList.remove("timer-complete-flash");
+    if (state.timerFlashTimeout) {
+      window.clearTimeout(state.timerFlashTimeout);
+      state.timerFlashTimeout = null;
+    }
+
+    if (shouldResetCompleted && hasFinishedTimer) {
+      state.restTimer = {
+        duration: 0,
+        remaining: 0,
+        endsAt: 0,
+        running: false,
+        completed: false,
+      };
+      if (shouldRender) {
+        render();
+      }
+    }
   }
 
   function clearRestTimerInterval() {
@@ -244,6 +280,7 @@
 
     const actionEl = event.target.closest("[data-action]");
     if (!actionEl) {
+      stopTimerFlash();
       const shouldCloseMenu = state.openGroupMenuId != null;
       state.openGroupMenuId = null;
       if (event.target.matches("[data-overlay-close='true']")) {
@@ -461,6 +498,10 @@
   });
 
   document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest(".rest-timer-button[data-action='start-rest-timer']")) {
+      stopTimerFlash();
+    }
+
     const timerButton = event.target.closest(".rest-timer-button[data-action='start-rest-timer']");
     if (!timerButton) {
       return;
@@ -472,6 +513,9 @@
     state.restTimerPressTimer = window.setTimeout(() => {
       state.suppressTimerClickUntil = Date.now() + 900;
       state.restTimerPressTimer = null;
+      if ((state.restTimer.running || state.restTimer.completed) && state.restTimer.duration === seconds) {
+        stopRestTimer();
+      }
       state.openGroupMenuId = null;
       openModal({ type: "rest-timer-editor", timerIndex, seconds });
     }, 650);
