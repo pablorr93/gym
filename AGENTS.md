@@ -45,12 +45,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=65`
+  - `styles.css?v=66`
   - `data.js?v=34`
   - `ui.js?v=61`
-  - `app.js?v=50`
+  - `app.js?v=51`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v73"`
+  - `CACHE_NAME = "gym-progress-v74"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -152,6 +152,8 @@ Tras cambios en JS/CSS:
 - En las tarjetas de `Ajustes`, el contenido queda ligeramente subido para verse mas centrado visualmente.
 - La nube debe guardar/cargar toda la rutina: grupos, subgrupos, ejercicios, pesos actuales/iniciales/siguiente subida, historial y temporizadores.
 - La configuracion de GitHub se introduce en un modal y se conserva localmente. Tratar el token como dato sensible: no imprimirlo en logs ni documentarlo en texto visible.
+- Al arrastrar grupos, subgrupos o ejercicios, debe verse claramente donde va a quedar antes de soltarlo. En listas de grupos tambien debe indicarse el destino al final de la lista.
+- Durante el arrastre tactil, el scroll debe tener una zona central muerta donde no se mueve. Al subir hacia la zona media/superior debe desplazarse hacia arriba de forma progresiva, y al bajar hacia la zona media/inferior debe desplazarse hacia abajo de forma progresiva.
 
 ## Problemas que hubo antes con el preview
 

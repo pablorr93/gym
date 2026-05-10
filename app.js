@@ -1248,6 +1248,8 @@
       placement.container.classList.add("is-over");
       if (placement.beforeGroup) {
         placement.beforeGroup.classList.add("is-group-drop-before");
+      } else {
+        placement.container.classList.add("is-group-drop-end");
       }
       return;
     }
@@ -1265,7 +1267,9 @@
 
   function clearDropHighlights() {
     document.querySelectorAll(".exercise-drop-section.is-over").forEach((section) => section.classList.remove("is-over"));
-    document.querySelectorAll(".child-group-list.is-over, .section-stack.is-over").forEach((section) => section.classList.remove("is-over"));
+    document.querySelectorAll(".child-group-list.is-over, .section-stack.is-over").forEach((section) => {
+      section.classList.remove("is-over", "is-group-drop-end");
+    });
     document.querySelectorAll(".exercise-card.is-drop-before").forEach((card) => card.classList.remove("is-drop-before"));
     document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-exercise-drop-target").forEach((group) => {
       group.classList.remove("is-group-drop-before", "is-exercise-drop-target");
@@ -1323,13 +1327,14 @@
   }
 
   function autoScrollForTouch(y) {
-    const edge = 92;
-    const maxStep = 18;
+    const topZone = window.innerHeight * 0.42;
+    const bottomZone = window.innerHeight * 0.58;
+    const maxStep = 10;
     let delta = 0;
-    if (y < edge) {
-      delta = -Math.max(6, Math.round(((edge - y) / edge) * maxStep));
-    } else if (y > window.innerHeight - edge) {
-      delta = Math.max(6, Math.round(((y - (window.innerHeight - edge)) / edge) * maxStep));
+    if (y < topZone) {
+      delta = -Math.max(2, Math.round(((topZone - y) / topZone) * maxStep));
+    } else if (y > bottomZone) {
+      delta = Math.max(2, Math.round(((y - bottomZone) / (window.innerHeight - bottomZone)) * maxStep));
     }
 
     if (!delta) {
@@ -1337,8 +1342,9 @@
     }
 
     const scroller = document.scrollingElement || document.documentElement;
+    const previousTop = scroller.scrollTop;
     scroller.scrollTop += delta;
-    return true;
+    return scroller.scrollTop !== previousTop;
   }
 
   function scheduleTouchAutoScroll() {

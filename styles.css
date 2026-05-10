@@ -436,6 +436,18 @@ body.timer-complete-flash::before {
   border-radius: var(--radius-xl);
 }
 
+.section-stack.is-over,
+.child-group-list.is-over {
+  outline: 1px solid rgba(139, 232, 78, 0.28);
+  outline-offset: 4px;
+  border-radius: 20px;
+}
+
+.section-stack.is-group-drop-end,
+.child-group-list.is-group-drop-end {
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
 .group-shell.is-exercise-drop-target .group-card {
   outline: 2px solid rgba(139, 232, 78, 0.35);
   outline-offset: 3px;
