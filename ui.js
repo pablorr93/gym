@@ -371,8 +371,12 @@
     const historyGroup = exercise ? groupLabel(state.storage, findGroup(state.storage, exercise.groupId) || { name: "Sin grupo" }) : "";
     const movement = entry.fromKg == null ? formatKg(entry.toKg || 0) : `${formatKg(entry.fromKg)} -> ${formatKg(entry.toKg || entry.fromKg)}`;
 
+    const focusAttributes = exercise
+      ? ` data-action="focus-routine-exercise" data-exercise-id="${escapeAttribute(exercise.id)}" role="button" tabindex="0"`
+      : "";
+
     return `
-      <article class="glass-card history-entry" data-history-entry-id="${escapeAttribute(entry.id)}" style="--glow: rgba(255, 217, 92, 0.06);">
+      <article class="glass-card history-entry" data-history-entry-id="${escapeAttribute(entry.id)}"${focusAttributes} style="--glow: rgba(255, 217, 92, 0.06);">
         <div class="card-body progress-rank">
           <div class="rank-meta">
             <h3 class="exercise-title">${escapeHtml(exerciseName)}</h3>

@@ -652,7 +652,7 @@
   });
 
   document.addEventListener("click", (event) => {
-    if (Date.now() < state.suppressClickUntil && event.target.closest(".exercise-card, .group-shell")) {
+    if (Date.now() < state.suppressClickUntil && event.target.closest(".exercise-card, .group-shell, .history-entry")) {
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -1127,9 +1127,11 @@
     state.historyPressTimer = window.setTimeout(() => {
       const entryId = state.historyPressTarget?.entryId;
       clearHistoryPressState();
+      state.suppressClickUntil = Date.now() + 1200;
       if (entryId && confirmAction("Eliminar esta entrada del historial?")) {
         persist(deleteHistoryEntry(state.storage, entryId));
       }
+      state.suppressClickUntil = Date.now() + 1200;
     }, 500);
   });
 

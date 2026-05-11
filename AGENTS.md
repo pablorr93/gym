@@ -47,10 +47,10 @@ Estado de versiones/cache al ultimo cambio:
 - `index.html`
   - `styles.css?v=69`
   - `data.js?v=34`
-  - `ui.js?v=62`
-  - `app.js?v=54`
+  - `ui.js?v=63`
+  - `app.js?v=55`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v79"`
+  - `CACHE_NAME = "gym-progress-v80"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -147,6 +147,7 @@ Tras cambios en JS/CSS:
 - Al cambiar entre `Rutina`, `Progreso` y `Ajustes`, cada pestana debe mantener su posicion de scroll al volver.
 - En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
 - En `Historial de cambios`, cada entrada muestra tambien el grupo/subgrupo del ejercicio con el mismo estilo de ruta que `Progreso por ejercicio`.
+- Al tocar una entrada de `Historial de cambios`, debe navegar a `Rutina`, desplegar el grupo/subgrupo del ejercicio y centrar su tarjeta sin abrir el modal. Mantener pulsado sigue eliminando la entrada del historial.
 - En las entradas de `Historial de cambios`, los textos en movil deben verse compactos como en desktop: nombre controlado, ruta pequena, estado pequeno y capsula de Kg/fecha sin saltos raros.
 - Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
 - `Ajustes` incluye una tarjeta `Datos en la nube` con botones `Configurar carpeta`, `Guardar en GitHub` y `Cargar desde GitHub`.
