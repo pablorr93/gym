@@ -1239,6 +1239,30 @@ body.is-touch-drag-active {
   touch-action: pan-y;
 }
 
+.history-entry > .card-body {
+  padding: 14px 15px 11px;
+}
+
+.history-entry .progress-rank {
+  gap: 10px;
+}
+
+.history-entry .rank-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.history-entry .exercise-title {
+  font-size: 1.34rem;
+  line-height: 1.04;
+}
+
+.history-entry .card-copy {
+  margin-top: 8px;
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
 .history-entry.is-pressing {
   outline: 2px solid rgba(255, 111, 125, 0.58);
   transform: scale(0.995);
@@ -1250,11 +1274,23 @@ body.is-touch-drag-active {
 }
 
 .history-meta {
+  min-width: 104px;
+  padding: 9px 11px;
+  border-radius: 18px;
   text-align: right;
 }
 
 .history-meta strong {
   color: var(--accent);
+  font-size: 1.04rem;
+  line-height: 1.12;
+}
+
+.history-meta .muted {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.86rem;
+  line-height: 1.15;
 }
 
 .ghost-button {

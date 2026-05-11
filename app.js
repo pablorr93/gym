@@ -577,8 +577,21 @@
       return;
     }
 
-    timerCompleteAudio.pause();
-    timerCompleteAudio.currentTime = 0;
+    const audio = timerCompleteAudio;
+    timerCompleteAudio = null;
+    timerSoundPrimed = false;
+    audio.removeEventListener("ended", handleTimerSoundEnded);
+    audio.pause();
+    try {
+      audio.currentTime = 0;
+    } catch (error) {
+      // Some mobile browsers reject seeking while releasing the media session.
+    }
+    audio.removeAttribute("src");
+    while (audio.firstChild) {
+      audio.removeChild(audio.firstChild);
+    }
+    audio.load();
   }
 
   function stopTimerFlash(options = {}) {

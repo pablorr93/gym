@@ -45,12 +45,12 @@ Cambios ya aplicados durante la sesion:
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=67`
+  - `styles.css?v=68`
   - `data.js?v=34`
   - `ui.js?v=62`
-  - `app.js?v=53`
+  - `app.js?v=54`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v77"`
+  - `CACHE_NAME = "gym-progress-v78"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -136,6 +136,7 @@ Tras cambios en JS/CSS:
 - La tarjeta superior incluye solo cuatro temporizadores de descanso, por defecto `00:30`, `01:00`, `01:30` y `02:00`. No debe haber boton `+` ni temporizadores extra visibles.
 - Al pulsar un temporizador empieza a contar directamente; si se vuelve a pulsar mientras cuenta, se para y vuelve a mostrar su tiempo normal.
 - Al llegar a `00:00`, el temporizador se queda mostrando `00:00`, la pantalla parpadea 60 veces y suena el audio de `assets/sounds/` en bucle mientras dure el parpadeo. El parpadeo y el sonido se cortan antes si el usuario pulsa la pantalla, y el temporizador vuelve a mostrar su tiempo original.
+- Al parar la alarma del temporizador, el audio debe liberarse por completo para que la musica del movil vuelva a su volumen normal.
 - Al mantener pulsado un temporizador, se abre la edicion de ese temporizador; si estaba contando, primero se para. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
 - La tarjeta superior de temporizadores no debe mostrar las cajas de metricas `Listos para subir` ni `Bloques musculares`.
 - En `Progreso`, la tarjeta `Progreso por ejercicio` muestra registros por ejercicio con grupo/subgrupo, barra con la misma logica porcentual que las barras de ejercicios y filas clicables.
@@ -146,6 +147,7 @@ Tras cambios en JS/CSS:
 - Al cambiar entre `Rutina`, `Progreso` y `Ajustes`, cada pestana debe mantener su posicion de scroll al volver.
 - En `Progreso`, deben mantenerse tambien los scrolls internos de `Progreso por ejercicio` y `Historial de cambios` al cambiar a cualquier otra pestana y volver.
 - En `Historial de cambios`, cada entrada muestra tambien el grupo/subgrupo del ejercicio con el mismo estilo de ruta que `Progreso por ejercicio`.
+- En las entradas de `Historial de cambios`, la capsula de Kg/fecha y el texto de estado son mas pequenos, el nombre del ejercicio tiene mas presencia y la tarjeta queda algo mas compacta por abajo.
 - Los scrolls de `Progreso` solo deben resetearse al salir/quitar la aplicacion, no al minimizarla ni cambiar de pestana.
 - `Ajustes` incluye una tarjeta `Datos en la nube` con botones `Configurar carpeta`, `Guardar en GitHub` y `Cargar desde GitHub`.
 - El hero de `Ajustes` usa el titulo literal `Ajustes`, con la misma separacion entre eyebrow y titulo que el hero de `Progreso`.
