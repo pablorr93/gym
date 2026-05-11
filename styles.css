@@ -1944,6 +1944,61 @@ body {
   line-height: 1.12;
 }
 
+.history-entry {
+  border-radius: 22px;
+}
+
+.history-entry > .card-body {
+  padding: 12px 14px 10px;
+}
+
+.history-entry .progress-rank {
+  gap: 8px;
+  align-items: center;
+}
+
+.history-entry .rank-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.history-entry .exercise-title {
+  font-size: 1.02rem;
+  line-height: 1.08;
+}
+
+.history-entry .history-group {
+  margin: 5px 0 7px;
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.history-entry .card-copy {
+  margin-top: 0;
+  font-size: 0.78rem;
+  line-height: 1.18;
+}
+
+.history-entry .history-meta {
+  flex: 0 0 126px;
+  min-width: 126px;
+  padding: 8px 9px;
+  border-radius: 16px;
+}
+
+.history-entry .history-meta strong {
+  font-size: 0.9rem;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.history-entry .history-meta .muted {
+  margin-top: 3px;
+  font-size: 0.72rem;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
 .mini-badge {
   min-height: 32px;
   padding: 7px 10px;
