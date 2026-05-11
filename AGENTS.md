@@ -47,10 +47,10 @@ Estado de versiones/cache al ultimo cambio:
 - `index.html`
   - `styles.css?v=69`
   - `data.js?v=34`
-  - `ui.js?v=63`
-  - `app.js?v=55`
+  - `ui.js?v=65`
+  - `app.js?v=56`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v80"`
+  - `CACHE_NAME = "gym-progress-v82"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -114,6 +114,7 @@ Tras cambios en JS/CSS:
 
 - Mantener estetica oscura con verde neon y acentos amarillos/naranja donde ya existan.
 - Mantener la cabecera con imagen PRR como primer impacto visual.
+- La imagen PRR de cabecera en `Rutina` intenta abrir directamente la playlist en la app de Spotify con `spotify:playlist:0Cs4HkwhV0jmmDBpnVYjJK` y usa como fallback el enlace web `https://open.spotify.com/playlist/0Cs4HkwhV0jmmDBpnVYjJK?si=f13c0fa115ea4cdb`.
 - Mantener tarjetas oscuras de bordes redondeados y efecto cristal.
 - Mantener la navegacion inferior fija con `Rutina`, `Progreso`, `Ajustes`.
 - Mantener el boton flotante `+ Anadir`.

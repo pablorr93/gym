@@ -56,7 +56,14 @@
           <div class="routine-lockup">
             <span class="eyebrow">Gym Progress</span>
             <h1 class="sr-only">Rutina</h1>
-            <img class="routine-logo" src="./assets/prr-header.png" alt="PRR" />
+            <button
+              class="routine-logo-link"
+              type="button"
+              data-action="open-spotify-playlist"
+              aria-label="Abrir playlist de Spotify"
+            >
+              <img class="routine-logo" src="./assets/prr-header.png" alt="PRR" />
+            </button>
           </div>
         </div>
         <article class="glass-card" style="--glow: rgba(139, 232, 78, 0.12);">

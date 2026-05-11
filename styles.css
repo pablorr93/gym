@@ -187,9 +187,23 @@ code {
   -webkit-text-stroke: 1px rgba(185, 244, 74, 0.14);
 }
 
+.routine-logo-link,
 .routine-logo {
   display: block;
   width: 100%;
+}
+
+.routine-logo-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.routine-logo {
   height: 238px;
   object-fit: cover;
   object-position: center;

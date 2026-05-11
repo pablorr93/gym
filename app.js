@@ -23,6 +23,8 @@
   const OLD_REST_TIMERS_KEY = "gym_rest_timers_v1";
   const GITHUB_CLOUD_KEY = "gym_github_cloud_v1";
   const GITHUB_CLOUD_FILE = "gym-progress-cloud.json";
+  const SPOTIFY_PLAYLIST_URI = "spotify:playlist:0Cs4HkwhV0jmmDBpnVYjJK";
+  const SPOTIFY_PLAYLIST_URL = "https://open.spotify.com/playlist/0Cs4HkwhV0jmmDBpnVYjJK?si=f13c0fa115ea4cdb";
   const AUTO_SCROLL_DEAD_ZONE_RATIO = 0.5;
   const AUTO_SCROLL_MAX_SPEED = 14;
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
@@ -204,6 +206,25 @@
 
   function confirmAction(message) {
     return window.confirm(message);
+  }
+
+  function openSpotifyPlaylist() {
+    let didLeavePage = false;
+    const cancelFallback = () => {
+      didLeavePage = true;
+    };
+
+    window.addEventListener("pagehide", cancelFallback, { once: true });
+    window.addEventListener("blur", cancelFallback, { once: true });
+    window.location.href = SPOTIFY_PLAYLIST_URI;
+
+    window.setTimeout(() => {
+      window.removeEventListener("pagehide", cancelFallback);
+      window.removeEventListener("blur", cancelFallback);
+      if (!didLeavePage) {
+        window.open(SPOTIFY_PLAYLIST_URL, "_blank", "noopener,noreferrer");
+      }
+    }, 900);
   }
 
   function loadRestTimerSlots() {
@@ -778,6 +799,11 @@
         loadCloudBackup().catch((error) => {
           window.alert(`No se pudo cargar desde GitHub: ${error.message}`);
         });
+        break;
+      case "open-spotify-playlist":
+        event.preventDefault();
+        event.stopPropagation();
+        openSpotifyPlaylist();
         break;
       case "delete-exercise":
         if (confirmAction("Se eliminara el ejercicio y todo su historial. Quieres continuar?")) {
