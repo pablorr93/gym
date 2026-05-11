@@ -1,7 +1,7 @@
 {
   "app": "gym-progress-web",
   "version": 1,
-  "exportedAt": "2026-05-11T14:53:35.529Z",
+  "exportedAt": "2026-05-11T15:53:54.582Z",
   "storage": {
     "groups": [
       {
@@ -796,7 +796,7 @@
   },
   "restTimers": [
     120,
-    2,
+    30,
     60,
     90
   ]
