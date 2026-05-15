@@ -89,9 +89,6 @@
   let timerSoundPlayCount = 0;
   let timerSoundRunId = 0;
   let timerSoundDelayTimeout = null;
-  let timerDuckingAudio = null;
-  let timerDuckingAudioUrl = null;
-  let timerDuckingPrimed = false;
   let timerAudioContext = null;
   let timerAlarmBuffer = null;
   let timerScheduledSource = null;
@@ -490,7 +487,6 @@
       running: true,
       completed: false,
     };
-    prepareScheduledTimerAlarm();
     ensureRestTimerInterval();
     render();
     pulseTimerFab();
@@ -580,7 +576,6 @@
 
   function primeTimerCompleteSound() {
     if (timerSoundPrimed) {
-      primeTimerDuckingAudio();
       return;
     }
 
@@ -610,82 +605,6 @@
         audio.volume = TIMER_SOUND_VOLUME;
       });
 
-    primeTimerDuckingAudio();
-  }
-
-  function createSilentDuckingAudioUrl() {
-    const sampleRate = 8000;
-    const sampleCount = Math.floor(sampleRate * 0.25);
-    const buffer = new ArrayBuffer(44 + sampleCount);
-    const view = new DataView(buffer);
-    const writeString = (offset, value) => {
-      for (let index = 0; index < value.length; index += 1) {
-        view.setUint8(offset + index, value.charCodeAt(index));
-      }
-    };
-
-    writeString(0, "RIFF");
-    view.setUint32(4, 36 + sampleCount, true);
-    writeString(8, "WAVE");
-    writeString(12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate, true);
-    view.setUint16(32, 1, true);
-    view.setUint16(34, 8, true);
-    writeString(36, "data");
-    view.setUint32(40, sampleCount, true);
-    for (let index = 0; index < sampleCount; index += 1) {
-      view.setUint8(44 + index, 128);
-    }
-
-    return URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
-  }
-
-  function getTimerDuckingAudio() {
-    if (timerDuckingAudio) {
-      return timerDuckingAudio;
-    }
-
-    timerDuckingAudioUrl = createSilentDuckingAudioUrl();
-    timerDuckingAudio = new Audio(timerDuckingAudioUrl);
-    timerDuckingAudio.loop = true;
-    timerDuckingAudio.preload = "auto";
-    return timerDuckingAudio;
-  }
-
-  function primeTimerDuckingAudio() {
-    if (timerDuckingPrimed) {
-      return;
-    }
-
-    const audio = getTimerDuckingAudio();
-    audio.muted = true;
-    audio.volume = 0;
-    const promise = audio.play();
-    if (!promise) {
-      timerDuckingPrimed = true;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.muted = false;
-      audio.volume = 1;
-      return;
-    }
-
-    promise
-      .then(() => {
-        timerDuckingPrimed = true;
-        audio.pause();
-        audio.currentTime = 0;
-        audio.muted = false;
-        audio.volume = 1;
-      })
-      .catch(() => {
-        audio.muted = false;
-        audio.volume = 1;
-      });
   }
 
   function getTimerAudioContext() {
@@ -816,30 +735,7 @@
     const runId = ++timerSoundRunId;
     timerSoundPlayCount = 0;
     timerSoundActive = true;
-    const webAudioStarted = startTimerAlarmBufferNow();
-    if (webAudioStarted) {
-      startTimerDuckingAudio();
-      return;
-    }
     playTimerSoundCycle(runId);
-  }
-
-  function startTimerDuckingAudio() {
-    const audio = getTimerDuckingAudio();
-    audio.pause();
-    try {
-      audio.currentTime = 0;
-    } catch (error) {
-      // Some mobile browsers reject seeking while the media session is warming up.
-    }
-    audio.muted = false;
-    audio.volume = 1;
-    const promise = audio.play();
-    if (promise) {
-      promise.catch(() => {
-        // Web Audio remains the audible alarm if the silent media channel is blocked.
-      });
-    }
   }
 
   function handleTimerSoundEnded() {
@@ -869,6 +765,9 @@
     const promise = audio.play();
     if (promise) {
       promise.catch(() => {
+        if (startTimerAlarmBufferNow()) {
+          return;
+        }
         timerSoundActive = false;
       });
     }
@@ -883,7 +782,6 @@
       window.clearTimeout(timerSoundDelayTimeout);
       timerSoundDelayTimeout = null;
     }
-    stopTimerDuckingAudio();
     if (!timerCompleteAudio) {
       return;
     }
@@ -903,23 +801,6 @@
       audio.removeChild(audio.firstChild);
     }
     audio.load();
-  }
-
-  function stopTimerDuckingAudio() {
-    if (!timerDuckingAudio) {
-      return;
-    }
-
-    const audio = timerDuckingAudio;
-    timerDuckingAudio = null;
-    timerDuckingPrimed = false;
-    audio.pause();
-    audio.removeAttribute("src");
-    audio.load();
-    if (timerDuckingAudioUrl) {
-      URL.revokeObjectURL(timerDuckingAudioUrl);
-      timerDuckingAudioUrl = null;
-    }
   }
 
   function isTimerAlarmActive() {
