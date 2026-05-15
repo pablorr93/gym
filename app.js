@@ -31,7 +31,7 @@
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
   const TIMER_SOUND_VOLUME = 0.26;
-  const TIMER_SOUND_REPEAT_DELAY_MS = 100;
+  const TIMER_SOUND_REPEAT_DELAY_MS = 0;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
     "./assets/sounds/timer-complete.wav",
