@@ -42,7 +42,7 @@ Cambios ya aplicados durante la sesion:
 - El archivo remoto de copia se llama `gym-progress-cloud.json` y se guarda dentro de la carpeta configurada del repositorio.
 - La subida/carga real a GitHub requiere un token introducido por el usuario con permisos de contenido del repositorio. No se probo con GitHub real porque no se proporciono token/repositorio.
 - Cuando hay un temporizador activo o completado, el boton flotante deja de mostrar `+ Anadir`, se expande y muestra la cuenta atras grande hasta `00:00`; al tocarlo se para el temporizador y vuelve a `+ Anadir`. La animacion del flotante solo debe dispararse al iniciar el temporizador o cuando cambia el segundo, no al pulsar grupos/subgrupos u otros elementos.
-- La alarma del temporizador usa volumen reducido (`TIMER_SOUND_VOLUME = 0.26`) y el arranque del sonido se sincroniza con el mismo frame en que empieza el parpadeo. Cuando Web Audio arranca la alarma, tambien se activa el audio HTML a volumen bajo (`TIMER_DUCKING_AUDIO_VOLUME = 0.08`) para que el movil vuelva a tratarlo como audio multimedia y baje la musica externa.
+- La alarma del temporizador usa volumen reducido (`TIMER_SOUND_VOLUME = 0.26`) y el arranque del sonido se sincroniza con el mismo frame en que empieza el parpadeo. Cuando Web Audio arranca la alarma, el audio HTML audible no debe reproducir el mismo archivo para evitar eco/repeticion; se usa un canal HTML silencioso (`timerDuckingAudio`) para intentar conservar el tratamiento multimedia del movil sin duplicar la alarma.
 - En el modal `Crear rapido`, el texto de los iconos redondos `[]` y `KG` queda centrado mediante `.option-icon-text` para poder ajustar el contenido sin deformar el circulo.
 - Al terminar un temporizador en `00:00`, tocar el flotante para pararlo no debe abrir el modal `Crear rapido`; el `pointerdown` del flotante de parada no debe resetearlo antes del `click`.
 - Mientras un temporizador esta activo, el contador solo actualiza los textos de los temporizadores y el flotante, sin repintar toda la rutina cada segundo, para no interferir con el arrastre tactil.
@@ -55,9 +55,9 @@ Estado de versiones/cache al ultimo cambio:
   - `styles.css?v=73`
   - `data.js?v=34`
   - `ui.js?v=70`
-  - `app.js?v=63`
+  - `app.js?v=64`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v90"`
+  - `CACHE_NAME = "gym-progress-v91"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -181,8 +181,8 @@ Tras cambios en JS/CSS:
 
 ## Ultima verificacion conocida
 
-Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=timer-audio-duck-v1`:
+Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=timer-no-duplicate-audio-v1`:
 
 - Al terminar un temporizador de `00:02`, el flotante muestra `00:00`, la alarma se activa y al tocar el flotante vuelve a `+ Anadir`.
-- El volumen de alarma subio a `0.26` y el audio HTML se mantiene como canal de ducking cuando Web Audio esta activo.
+- Web Audio queda como unico sonido audible cuando esta disponible; el canal HTML de apoyo es silencioso para no duplicar la alarma.
 - Los archivos `data.js`, `ui.js` y `app.js` pasaron `node --check`.

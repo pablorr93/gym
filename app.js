@@ -31,7 +31,6 @@
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
   const TIMER_SOUND_VOLUME = 0.26;
-  const TIMER_DUCKING_AUDIO_VOLUME = 0.08;
   const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
@@ -89,8 +88,10 @@
   let timerSoundActive = false;
   let timerSoundPlayCount = 0;
   let timerSoundRunId = 0;
-  let timerHtmlAudioVolume = TIMER_SOUND_VOLUME;
   let timerSoundDelayTimeout = null;
+  let timerDuckingAudio = null;
+  let timerDuckingAudioUrl = null;
+  let timerDuckingPrimed = false;
   let timerAudioContext = null;
   let timerAlarmBuffer = null;
   let timerScheduledSource = null;
@@ -579,6 +580,7 @@
 
   function primeTimerCompleteSound() {
     if (timerSoundPrimed) {
+      primeTimerDuckingAudio();
       return;
     }
 
@@ -606,6 +608,83 @@
       .catch(() => {
         audio.muted = false;
         audio.volume = TIMER_SOUND_VOLUME;
+      });
+
+    primeTimerDuckingAudio();
+  }
+
+  function createSilentDuckingAudioUrl() {
+    const sampleRate = 8000;
+    const sampleCount = Math.floor(sampleRate * 0.25);
+    const buffer = new ArrayBuffer(44 + sampleCount);
+    const view = new DataView(buffer);
+    const writeString = (offset, value) => {
+      for (let index = 0; index < value.length; index += 1) {
+        view.setUint8(offset + index, value.charCodeAt(index));
+      }
+    };
+
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + sampleCount, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate, true);
+    view.setUint16(32, 1, true);
+    view.setUint16(34, 8, true);
+    writeString(36, "data");
+    view.setUint32(40, sampleCount, true);
+    for (let index = 0; index < sampleCount; index += 1) {
+      view.setUint8(44 + index, 128);
+    }
+
+    return URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
+  }
+
+  function getTimerDuckingAudio() {
+    if (timerDuckingAudio) {
+      return timerDuckingAudio;
+    }
+
+    timerDuckingAudioUrl = createSilentDuckingAudioUrl();
+    timerDuckingAudio = new Audio(timerDuckingAudioUrl);
+    timerDuckingAudio.loop = true;
+    timerDuckingAudio.preload = "auto";
+    return timerDuckingAudio;
+  }
+
+  function primeTimerDuckingAudio() {
+    if (timerDuckingPrimed) {
+      return;
+    }
+
+    const audio = getTimerDuckingAudio();
+    audio.muted = true;
+    audio.volume = 0;
+    const promise = audio.play();
+    if (!promise) {
+      timerDuckingPrimed = true;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = false;
+      audio.volume = 1;
+      return;
+    }
+
+    promise
+      .then(() => {
+        timerDuckingPrimed = true;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+        audio.volume = 1;
+      })
+      .catch(() => {
+        audio.muted = false;
+        audio.volume = 1;
       });
   }
 
@@ -738,8 +817,29 @@
     timerSoundPlayCount = 0;
     timerSoundActive = true;
     const webAudioStarted = startTimerAlarmBufferNow();
-    timerHtmlAudioVolume = webAudioStarted ? TIMER_DUCKING_AUDIO_VOLUME : TIMER_SOUND_VOLUME;
+    if (webAudioStarted) {
+      startTimerDuckingAudio();
+      return;
+    }
     playTimerSoundCycle(runId);
+  }
+
+  function startTimerDuckingAudio() {
+    const audio = getTimerDuckingAudio();
+    audio.pause();
+    try {
+      audio.currentTime = 0;
+    } catch (error) {
+      // Some mobile browsers reject seeking while the media session is warming up.
+    }
+    audio.muted = false;
+    audio.volume = 1;
+    const promise = audio.play();
+    if (promise) {
+      promise.catch(() => {
+        // Web Audio remains the audible alarm if the silent media channel is blocked.
+      });
+    }
   }
 
   function handleTimerSoundEnded() {
@@ -764,7 +864,7 @@
     audio.pause();
     audio.currentTime = 0;
     audio.muted = false;
-    audio.volume = timerHtmlAudioVolume;
+    audio.volume = TIMER_SOUND_VOLUME;
     timerSoundPlayCount += 1;
     const promise = audio.play();
     if (promise) {
@@ -778,12 +878,12 @@
     timerSoundActive = false;
     timerSoundRunId += 1;
     timerSoundPlayCount = 0;
-    timerHtmlAudioVolume = TIMER_SOUND_VOLUME;
     stopScheduledTimerAlarm();
     if (timerSoundDelayTimeout) {
       window.clearTimeout(timerSoundDelayTimeout);
       timerSoundDelayTimeout = null;
     }
+    stopTimerDuckingAudio();
     if (!timerCompleteAudio) {
       return;
     }
@@ -803,6 +903,23 @@
       audio.removeChild(audio.firstChild);
     }
     audio.load();
+  }
+
+  function stopTimerDuckingAudio() {
+    if (!timerDuckingAudio) {
+      return;
+    }
+
+    const audio = timerDuckingAudio;
+    timerDuckingAudio = null;
+    timerDuckingPrimed = false;
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+    if (timerDuckingAudioUrl) {
+      URL.revokeObjectURL(timerDuckingAudioUrl);
+      timerDuckingAudioUrl = null;
+    }
   }
 
   function isTimerAlarmActive() {
