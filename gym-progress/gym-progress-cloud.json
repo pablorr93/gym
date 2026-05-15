@@ -1,13 +1,13 @@
 {
   "app": "gym-progress-web",
   "version": 1,
-  "exportedAt": "2026-05-11T14:53:35.529Z",
+  "exportedAt": "2026-05-15T14:51:37.206Z",
   "storage": {
     "groups": [
       {
         "id": "g_pecho",
         "name": "Pecho",
-        "order": 0,
+        "order": 1,
         "parentId": null,
         "isExpanded": false,
         "updatedAt": "2026-05-10T18:35:59.952Z"
@@ -15,18 +15,18 @@
       {
         "id": "g_brazos",
         "name": "Brazos",
-        "order": 1,
+        "order": 0,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-10T18:51:28.495Z"
+        "updatedAt": "2026-05-13T11:02:33.088Z"
       },
       {
         "id": "g_biceps",
         "name": "Biceps",
         "order": 0,
         "parentId": "g_brazos",
-        "isExpanded": false,
-        "updatedAt": "2026-05-10T17:53:59.894Z"
+        "isExpanded": true,
+        "updatedAt": "2026-05-13T11:02:25.361Z"
       },
       {
         "id": "g_triceps",
@@ -112,7 +112,7 @@
         "currentKg": 18,
         "nextKg": 20,
         "order": 0,
-        "updatedAt": "2026-05-11T14:44:01.457Z",
+        "updatedAt": "2026-05-13T11:52:52.300Z",
         "notes": "",
         "readyToIncrease": false,
         "isSeparated": false,
@@ -125,9 +125,9 @@
         "currentKg": 30,
         "nextKg": 35,
         "order": 2,
-        "updatedAt": "2026-05-11T09:45:47.545Z",
+        "updatedAt": "2026-05-13T12:04:17.956Z",
         "notes": "",
-        "readyToIncrease": false,
+        "readyToIncrease": true,
         "isSeparated": false,
         "initialKg": 25
       },
@@ -161,10 +161,10 @@
         "id": "e_biceps_mancuernas",
         "groupId": "g_biceps",
         "name": "Biceps Mancuernas",
-        "currentKg": 7,
-        "nextKg": 8,
+        "currentKg": 8,
+        "nextKg": 9,
         "order": 1,
-        "updatedAt": "2026-05-09T20:30:18.344Z",
+        "updatedAt": "2026-05-13T10:58:04.794Z",
         "notes": "",
         "readyToIncrease": false,
         "isSeparated": false,
@@ -175,11 +175,11 @@
         "groupId": "g_biceps",
         "name": "Abierto Poleas Exterior",
         "currentKg": 15,
-        "nextKg": 20,
+        "nextKg": 17.5,
         "order": 2,
-        "updatedAt": "2026-05-10T19:28:47.518Z",
+        "updatedAt": "2026-05-13T11:12:23.397Z",
         "notes": "2 pasos adelante, 1 hacía el bíceps a trabajar, flexión hacía el exterior con codo pegado. Poleas altura de las muñecas",
-        "readyToIncrease": false,
+        "readyToIncrease": true,
         "isSeparated": false,
         "initialKg": 12.5
       },
@@ -228,12 +228,12 @@
         "name": "Pecho Maquina",
         "notes": "",
         "initialKg": 25,
-        "currentKg": 30,
-        "nextKg": 35,
-        "readyToIncrease": false,
+        "currentKg": 35,
+        "nextKg": 40,
+        "readyToIncrease": true,
         "isSeparated": false,
         "order": 1,
-        "updatedAt": "2026-05-11T09:46:21.054Z"
+        "updatedAt": "2026-05-13T11:59:57.568Z"
       },
       {
         "id": "1778358293706-772006",
@@ -324,7 +324,7 @@
         "readyToIncrease": true,
         "isSeparated": true,
         "order": 0,
-        "updatedAt": "2026-05-10T13:26:26.911Z"
+        "updatedAt": "2026-05-13T12:57:03.986Z"
       },
       {
         "id": "1778359387521-62388",
@@ -363,7 +363,7 @@
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 0,
-        "updatedAt": "2026-05-10T17:32:52.378Z"
+        "updatedAt": "2026-05-13T12:16:55.688Z"
       },
       {
         "id": "1778359600299-576596",
@@ -787,6 +787,36 @@
         "toKg": 10,
         "createdAt": "2026-05-11T14:51:14.243Z",
         "note": "Peso actual actualizado"
+      },
+      {
+        "id": "1778669884794-700238",
+        "exerciseId": "e_biceps_mancuernas",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 7,
+        "toKg": 8,
+        "createdAt": "2026-05-13T10:58:04.794Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778670743397-437710",
+        "exerciseId": "e_biceps_poleas",
+        "type": "manualEdit",
+        "metric": "nextKg",
+        "fromKg": 20,
+        "toKg": 17.5,
+        "createdAt": "2026-05-13T11:12:23.397Z",
+        "note": "Objetivo actualizado"
+      },
+      {
+        "id": "1778673415062-741473",
+        "exerciseId": "1778358255471-1005875",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 30,
+        "toKg": 35,
+        "createdAt": "2026-05-13T11:56:55.061Z",
+        "note": "Subida aplicada"
       }
     ],
     "snapshot": {
