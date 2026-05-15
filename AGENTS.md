@@ -41,17 +41,19 @@ Cambios ya aplicados durante la sesion:
 - La configuracion de nube se guarda en `localStorage` con la clave `gym_github_cloud_v1` e incluye usuario/organizacion, repositorio, rama, carpeta y token.
 - El archivo remoto de copia se llama `gym-progress-cloud.json` y se guarda dentro de la carpeta configurada del repositorio.
 - La subida/carga real a GitHub requiere un token introducido por el usuario con permisos de contenido del repositorio. No se probo con GitHub real porque no se proporciono token/repositorio.
-- Cuando hay un temporizador activo o completado, el boton flotante deja de mostrar `+ Anadir`, se expande con una animacion y muestra la cuenta atras grande hasta `00:00`; al tocarlo se para el temporizador y vuelve a `+ Anadir`.
+- Cuando hay un temporizador activo o completado, el boton flotante deja de mostrar `+ Anadir`, se expande y muestra la cuenta atras grande hasta `00:00`; al tocarlo se para el temporizador y vuelve a `+ Anadir`. La animacion del flotante solo debe dispararse al iniciar el temporizador o cuando cambia el segundo, no al pulsar grupos/subgrupos u otros elementos.
+- La alarma del temporizador usa volumen muy reducido (`TIMER_SOUND_VOLUME = 0.18`) y el arranque del sonido se sincroniza con el mismo frame en que empieza el parpadeo.
+- En el modal `Crear rapido`, el texto de los iconos redondos `[]` y `KG` queda centrado mediante `.option-icon-text` para poder ajustar el contenido sin deformar el circulo.
 
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=70`
+  - `styles.css?v=72`
   - `data.js?v=34`
-  - `ui.js?v=68`
-  - `app.js?v=59`
+  - `ui.js?v=69`
+  - `app.js?v=60`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v85"`
+  - `CACHE_NAME = "gym-progress-v87"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -119,7 +121,7 @@ Tras cambios en JS/CSS:
 - Mantener tarjetas oscuras de bordes redondeados y efecto cristal.
 - Mantener la navegacion inferior fija con `Rutina`, `Progreso`, `Ajustes`.
 - Mantener el boton flotante `+ Anadir`.
-- Al activar un temporizador, el boton flotante se agranda y muestra la cuenta atras con numeros grandes. Mientras este corriendo o terminado en `00:00`, tocar el flotante para el temporizador y restaura `+ Anadir`.
+- Al activar un temporizador, el boton flotante se agranda y muestra la cuenta atras con numeros grandes. Mientras este corriendo o terminado en `00:00`, tocar el flotante para el temporizador y restaura `+ Anadir`. El pulso visual del flotante solo ocurre al iniciar o cambiar de segundo.
 - Mantener el modo tunel para subgrupos anidados. El usuario lo prefiere porque visualmente deja claro que un subgrupo esta dentro de otro.
 - No convertir subgrupos anidados en lista plana.
 - Los subgrupos deben conservar un espaciado visual equilibrado dentro del grupo padre, sin que el lado izquierdo quede mas apretado que el derecho.
@@ -174,9 +176,7 @@ Tras cambios en JS/CSS:
 
 ## Ultima verificacion conocida
 
-Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=fab-timer-v2`:
+Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=quick-icon-center-v1`:
 
-- Al activar un temporizador, el flotante cambia de `+ Anadir` a la cuenta atras y usa la clase visual expandida.
-- Al llegar a `00:00`, el flotante se queda mostrando `00:00` con estado completado.
-- Al tocar el flotante completado, se para el temporizador y vuelve a `+ Anadir`.
-- Los archivos `data.js`, `ui.js` y `app.js` pasaron `node --check`.
+- En el modal `Crear rapido`, los iconos de `Nuevo grupo` y `Nuevo ejercicio` siguen redondos y el texto interior queda mejor centrado.
+- El archivo `ui.js` paso `node --check`.

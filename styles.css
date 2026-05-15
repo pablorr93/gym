@@ -1645,11 +1645,31 @@ body.is-touch-drag-active {
 .option-icon {
   width: 52px;
   height: 52px;
+  flex: 0 0 52px;
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border-radius: 18px;
+  border-radius: 50%;
   font-size: 22px;
   background: rgba(139, 232, 78, 0.12);
+}
+
+.option-icon-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  text-align: center;
+}
+
+.option-icon-text.is-group {
+  transform: translate(0.5px, -0.5px);
+}
+
+.option-icon-text.is-kg {
+  transform: translate(0.25px, 0);
 }
 
 .option-title {
@@ -1854,6 +1874,9 @@ body {
     linear-gradient(115deg, rgba(255, 255, 255, 0.36) 0 10%, transparent 10% 17%, transparent 100%),
     linear-gradient(135deg, #cfff48, var(--accent) 46%, #5ed766);
   box-shadow: 0 20px 42px rgba(139, 232, 78, 0.32), 0 0 0 1px rgba(220, 255, 96, 0.42) inset;
+}
+
+.fab.is-timer-pulse {
   animation: fabTimerBloom 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1863,7 +1886,7 @@ body {
 }
 
 .fab.is-timer-complete {
-  animation: fabTimerBloom 420ms cubic-bezier(0.16, 1, 0.3, 1) both, fabTimerCompletePulse 900ms ease-in-out infinite;
+  box-shadow: 0 22px 54px rgba(202, 255, 99, 0.46), 0 0 0 1px rgba(220, 255, 96, 0.62) inset;
 }
 
 .bottom-nav {
@@ -1944,7 +1967,8 @@ body {
 .option-icon {
   width: 44px;
   height: 44px;
-  border-radius: 15px;
+  flex-basis: 44px;
+  border-radius: 50%;
   font-size: 19px;
 }
 

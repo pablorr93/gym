@@ -30,7 +30,7 @@
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
-  const TIMER_SOUND_VOLUME = 0.55;
+  const TIMER_SOUND_VOLUME = 0.18;
   const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
@@ -101,6 +101,18 @@
 
   function render() {
     app.innerHTML = window.GymUI.renderApp(state);
+  }
+
+  function pulseTimerFab() {
+    const fab = app.querySelector(".fab.is-timer-active");
+    if (!fab) {
+      return;
+    }
+
+    fab.classList.remove("is-timer-pulse");
+    window.requestAnimationFrame(() => {
+      fab.classList.add("is-timer-pulse");
+    });
   }
 
   function saveCurrentTabViewState() {
@@ -456,6 +468,7 @@
     prepareScheduledTimerAlarm();
     ensureRestTimerInterval();
     render();
+    pulseTimerFab();
   }
 
   function stopRestTimer() {
@@ -500,6 +513,7 @@
     }
 
     render();
+    pulseTimerFab();
   }
 
   function updateRestTimerFromLifecycle() {
@@ -515,9 +529,9 @@
     document.body.classList.remove("timer-complete-flash");
     window.requestAnimationFrame(() => {
       document.body.classList.add("timer-complete-flash");
+      playTimerCompleteSound();
       state.timerFlashTimeout = window.setTimeout(stopTimerFlash, TIMER_FLASH_COUNT * TIMER_FLASH_DURATION_MS);
     });
-    playTimerCompleteSound();
   }
 
   function getTimerCompleteAudio() {
@@ -667,15 +681,37 @@
     }
   }
 
+  function startTimerAlarmBufferNow() {
+    if (!timerAudioContext || timerAudioContext.state !== "running" || !timerAlarmBuffer) {
+      return false;
+    }
+
+    stopScheduledTimerAlarm();
+    const source = timerAudioContext.createBufferSource();
+    const gain = timerAudioContext.createGain();
+    source.buffer = timerAlarmBuffer;
+    source.loop = true;
+    gain.gain.value = TIMER_SOUND_VOLUME;
+    source.connect(gain);
+    gain.connect(timerAudioContext.destination);
+    source.onended = () => {
+      if (timerScheduledSource === source) {
+        timerScheduledSource = null;
+        timerScheduledGain = null;
+      }
+    };
+    timerScheduledSource = source;
+    timerScheduledGain = gain;
+    source.start();
+    return true;
+  }
+
   function playTimerCompleteSound() {
     timerSoundRunId += 1;
     timerSoundPlayCount = 0;
     timerSoundActive = true;
-    if (timerScheduledSource) {
-      if (!timerAudioContext || timerAudioContext.state === "running") {
-        return;
-      }
-      stopScheduledTimerAlarm();
+    if (startTimerAlarmBufferNow()) {
+      return;
     }
     playTimerSoundCycle(timerSoundRunId);
   }

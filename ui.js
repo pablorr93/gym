@@ -731,14 +731,14 @@
       </div>
       <div class="option-list">
         <button class="option-button" data-action="quick-create-group">
-          <span class="option-icon">[]</span>
+          <span class="option-icon"><span class="option-icon-text is-group">[]</span></span>
           <span>
             <strong class="option-title">Nuevo grupo</strong>
             <p class="option-copy">Crea un bloque muscular raiz o un nuevo bloque de trabajo.</p>
           </span>
         </button>
         <button class="option-button" data-action="quick-create-exercise">
-          <span class="option-icon">KG</span>
+          <span class="option-icon"><span class="option-icon-text is-kg">KG</span></span>
           <span>
             <strong class="option-title">Nuevo ejercicio</strong>
             <p class="option-copy">Anade un movimiento con peso actual, siguiente objetivo y notas.</p>
