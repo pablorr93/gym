@@ -42,8 +42,8 @@ Cambios ya aplicados durante la sesion:
 - El archivo remoto de copia se llama `gym-progress-cloud.json` y se guarda dentro de la carpeta configurada del repositorio.
 - La subida/carga real a GitHub requiere un token introducido por el usuario con permisos de contenido del repositorio. No se probo con GitHub real porque no se proporciono token/repositorio.
 - Cuando hay un temporizador activo o completado, el boton flotante deja de mostrar `+ Anadir`, se expande y muestra la cuenta atras grande hasta `00:00`; al tocarlo se para el temporizador y vuelve a `+ Anadir`. La animacion del flotante solo debe dispararse al iniciar el temporizador o cuando cambia el segundo, no al pulsar grupos/subgrupos u otros elementos.
-- La alarma del temporizador usa volumen reducido (`TIMER_SOUND_VOLUME = 0.26`) y el arranque del sonido se sincroniza con el mismo frame en que empieza el parpadeo. Para evitar eco/repeticion en movil, la alarma normal usa una sola ruta audible: audio HTML. No volver a reproducir el mismo sonido a la vez con Web Audio ni con canales HTML de apoyo; Web Audio solo puede quedar como respaldo si falla el audio HTML.
-- La repeticion de la alarma HTML usa `TIMER_SOUND_REPEAT_DELAY_MS = 0` para compensar la latencia del reinicio en movil y mantener el retardo audible corto que el usuario prefirio.
+- La alarma del temporizador usa volumen reducido (`TIMER_SOUND_VOLUME = 0.26`) y el arranque del sonido se sincroniza con el mismo frame en que empieza el parpadeo. Para evitar eco/repeticion en movil, solo debe sonar una ruta audible cada vez.
+- La repeticion de alarma vuelve a usar `TIMER_SOUND_REPEAT_DELAY_MS = 100`. Para que los cascos Bluetooth no anadan latencia en cada repeticion, Web Audio prepara un buffer en bucle con 100 ms de silencio al final (`createTimerLoopBuffer`) y lo usa como ruta principal cuando esta disponible; audio HTML queda como respaldo si Web Audio no se prepara.
 - En el modal `Crear rapido`, el texto de los iconos redondos `[]` y `KG` queda centrado mediante `.option-icon-text` para poder ajustar el contenido sin deformar el circulo.
 - Al terminar un temporizador en `00:00`, tocar el flotante para pararlo no debe abrir el modal `Crear rapido`; el `pointerdown` del flotante de parada no debe resetearlo antes del `click`.
 - Mientras un temporizador esta activo, el contador solo actualiza los textos de los temporizadores y el flotante, sin repintar toda la rutina cada segundo, para no interferir con el arrastre tactil.
@@ -56,9 +56,9 @@ Estado de versiones/cache al ultimo cambio:
   - `styles.css?v=73`
   - `data.js?v=34`
   - `ui.js?v=70`
-  - `app.js?v=66`
+  - `app.js?v=67`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v93"`
+  - `CACHE_NAME = "gym-progress-v94"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -182,8 +182,8 @@ Tras cambios en JS/CSS:
 
 ## Ultima verificacion conocida
 
-Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=timer-repeat-delay-v1`:
+Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=timer-bluetooth-repeat-v1`:
 
 - Al terminar un temporizador de `00:02`, el flotante muestra `00:00`, la alarma se activa y al tocar el flotante vuelve a `+ Anadir`.
-- La ruta normal de alarma queda en un solo audio HTML y el retardo programado de repeticion queda en `0 ms` para compensar la latencia de reinicio del movil.
+- La ruta principal de alarma usa Web Audio con un buffer que incluye 100 ms de silencio para repetir sin reiniciar el archivo en cada ciclo; HTML queda como respaldo.
 - Los archivos `data.js`, `ui.js` y `app.js` pasaron `node --check`.

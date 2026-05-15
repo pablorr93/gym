@@ -31,7 +31,7 @@
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
   const TIMER_SOUND_VOLUME = 0.26;
-  const TIMER_SOUND_REPEAT_DELAY_MS = 0;
+  const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
     "./assets/sounds/timer-complete.wav",
@@ -487,6 +487,7 @@
       running: true,
       completed: false,
     };
+    prepareTimerAlarmBuffer();
     ensureRestTimerInterval();
     render();
     pulseTimerFab();
@@ -633,7 +634,8 @@
           continue;
         }
         const audioData = await response.arrayBuffer();
-        timerAlarmBuffer = await audioContext.decodeAudioData(audioData);
+        const decodedBuffer = await audioContext.decodeAudioData(audioData);
+        timerAlarmBuffer = createTimerLoopBuffer(audioContext, decodedBuffer);
         return timerAlarmBuffer;
       } catch (error) {
         // Try the next supported source format.
@@ -641,6 +643,35 @@
     }
 
     return null;
+  }
+
+  function createTimerLoopBuffer(audioContext, sourceBuffer) {
+    const silenceFrames = Math.max(0, Math.round(audioContext.sampleRate * (TIMER_SOUND_REPEAT_DELAY_MS / 1000)));
+    const loopBuffer = audioContext.createBuffer(
+      sourceBuffer.numberOfChannels,
+      sourceBuffer.length + silenceFrames,
+      sourceBuffer.sampleRate,
+    );
+
+    for (let channel = 0; channel < sourceBuffer.numberOfChannels; channel += 1) {
+      loopBuffer.copyToChannel(sourceBuffer.getChannelData(channel), channel, 0);
+    }
+
+    return loopBuffer;
+  }
+
+  function prepareTimerAlarmBuffer() {
+    const audioContext = getTimerAudioContext();
+    if (!audioContext) {
+      return;
+    }
+
+    const resumePromise = audioContext.state === "suspended" ? audioContext.resume() : Promise.resolve();
+    resumePromise
+      .then(() => loadTimerAlarmBuffer(audioContext))
+      .catch(() => {
+        // HTML audio remains available as a fallback if Web Audio cannot be prepared.
+      });
   }
 
   function prepareScheduledTimerAlarm() {
@@ -735,6 +766,9 @@
     const runId = ++timerSoundRunId;
     timerSoundPlayCount = 0;
     timerSoundActive = true;
+    if (startTimerAlarmBufferNow()) {
+      return;
+    }
     playTimerSoundCycle(runId);
   }
 
