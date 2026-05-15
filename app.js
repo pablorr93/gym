@@ -30,7 +30,8 @@
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
-  const TIMER_SOUND_VOLUME = 0.18;
+  const TIMER_SOUND_VOLUME = 0.26;
+  const TIMER_DUCKING_AUDIO_VOLUME = 0.08;
   const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
@@ -88,6 +89,7 @@
   let timerSoundActive = false;
   let timerSoundPlayCount = 0;
   let timerSoundRunId = 0;
+  let timerHtmlAudioVolume = TIMER_SOUND_VOLUME;
   let timerSoundDelayTimeout = null;
   let timerAudioContext = null;
   let timerAlarmBuffer = null;
@@ -110,9 +112,31 @@
     }
 
     fab.classList.remove("is-timer-pulse");
-    window.requestAnimationFrame(() => {
-      fab.classList.add("is-timer-pulse");
+    void fab.offsetWidth;
+    fab.classList.add("is-timer-pulse");
+  }
+
+  function updateRestTimerView() {
+    const restTimer = state.restTimer;
+    const label = window.GymUI.formatTimer(restTimer.remaining);
+
+    document.querySelectorAll(".rest-timer-button[data-action='start-rest-timer']").forEach((button) => {
+      const isCurrent = Number(button.dataset.seconds) === restTimer.duration && (restTimer.running || restTimer.completed);
+      button.classList.toggle("is-active", isCurrent);
+      button.textContent = isCurrent ? label : window.GymUI.formatTimer(button.dataset.seconds);
     });
+
+    const fab = app.querySelector(".fab.is-timer-active");
+    if (!fab) {
+      return;
+    }
+
+    fab.classList.toggle("is-timer-complete", restTimer.completed);
+    fab.setAttribute("aria-label", `Parar temporizador ${label}`);
+    const countdown = fab.querySelector(".fab-countdown");
+    if (countdown) {
+      countdown.textContent = label;
+    }
   }
 
   function saveCurrentTabViewState() {
@@ -505,15 +529,18 @@
 
     state.restTimer.remaining = remaining;
 
-    if (remaining <= 0) {
+    const completedNow = remaining <= 0;
+    if (completedNow) {
       state.restTimer.running = false;
       state.restTimer.completed = true;
       clearRestTimerInterval();
-      triggerRestTimerComplete();
     }
 
-    render();
+    updateRestTimerView();
     pulseTimerFab();
+    if (completedNow) {
+      triggerRestTimerComplete();
+    }
   }
 
   function updateRestTimerFromLifecycle() {
@@ -707,13 +734,12 @@
   }
 
   function playTimerCompleteSound() {
-    timerSoundRunId += 1;
+    const runId = ++timerSoundRunId;
     timerSoundPlayCount = 0;
     timerSoundActive = true;
-    if (startTimerAlarmBufferNow()) {
-      return;
-    }
-    playTimerSoundCycle(timerSoundRunId);
+    const webAudioStarted = startTimerAlarmBufferNow();
+    timerHtmlAudioVolume = webAudioStarted ? TIMER_DUCKING_AUDIO_VOLUME : TIMER_SOUND_VOLUME;
+    playTimerSoundCycle(runId);
   }
 
   function handleTimerSoundEnded() {
@@ -738,7 +764,7 @@
     audio.pause();
     audio.currentTime = 0;
     audio.muted = false;
-    audio.volume = TIMER_SOUND_VOLUME;
+    audio.volume = timerHtmlAudioVolume;
     timerSoundPlayCount += 1;
     const promise = audio.play();
     if (promise) {
@@ -752,6 +778,7 @@
     timerSoundActive = false;
     timerSoundRunId += 1;
     timerSoundPlayCount = 0;
+    timerHtmlAudioVolume = TIMER_SOUND_VOLUME;
     stopScheduledTimerAlarm();
     if (timerSoundDelayTimeout) {
       window.clearTimeout(timerSoundDelayTimeout);
@@ -1151,7 +1178,10 @@
   });
 
   document.addEventListener("pointerdown", (event) => {
-    if (!event.target.closest(".rest-timer-button[data-action='start-rest-timer']")) {
+    if (
+      !event.target.closest(".rest-timer-button[data-action='start-rest-timer']") &&
+      !event.target.closest(".fab[data-action='stop-rest-timer']")
+    ) {
       const hadActiveAlarm = isTimerAlarmActive();
       if (hadActiveAlarm) {
         stopExpiredRestTimerAlarm();
@@ -1450,6 +1480,28 @@
   function getGroupDropPlacement(x, y) {
     const element = document.elementFromPoint(x, y);
     const activeGroupId = state.draggingGroupId || state.touchDrag?.id;
+    const targetGroupShell = element?.closest("[data-drag-group-id]");
+    const targetGroupId = targetGroupShell?.dataset.dragGroupId || null;
+    if (activeGroupId && targetGroupShell && targetGroupId && targetGroupId !== activeGroupId) {
+      const descendants = new Set(collectGroupShellDescendantIds(activeGroupId));
+      if (!descendants.has(targetGroupId)) {
+        const rect = targetGroupShell.getBoundingClientRect();
+        const relativeY = rect.height ? (y - rect.top) / rect.height : 0.5;
+        if (relativeY >= 0.28 && relativeY <= 0.72) {
+          return {
+            type: "group",
+            container: null,
+            targetGroupShell,
+            targetParentId: targetGroupId,
+            beforeGroup: null,
+            afterGroup: null,
+            beforeGroupId: null,
+            isInsideTarget: true,
+          };
+        }
+      }
+    }
+
     const container = element?.closest("[data-group-list-parent]");
     if (!container || !activeGroupId) {
       return null;
@@ -1498,6 +1550,11 @@
     }
 
     if (placement.type === "group") {
+      if (placement.isInsideTarget && placement.targetGroupShell) {
+        placement.targetGroupShell.classList.add("is-group-drop-inside");
+        return;
+      }
+
       placement.container.classList.add("is-over");
       if (placement.beforeGroup) {
         placement.beforeGroup.classList.add("is-group-drop-before");
@@ -1526,8 +1583,8 @@
       section.classList.remove("is-over", "is-group-drop-end");
     });
     document.querySelectorAll(".exercise-card.is-drop-before").forEach((card) => card.classList.remove("is-drop-before"));
-    document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-group-drop-after, .group-shell.is-exercise-drop-target").forEach((group) => {
-      group.classList.remove("is-group-drop-before", "is-group-drop-after", "is-exercise-drop-target");
+    document.querySelectorAll(".group-shell.is-group-drop-before, .group-shell.is-group-drop-after, .group-shell.is-group-drop-inside, .group-shell.is-exercise-drop-target").forEach((group) => {
+      group.classList.remove("is-group-drop-before", "is-group-drop-after", "is-group-drop-inside", "is-exercise-drop-target");
     });
   }
 

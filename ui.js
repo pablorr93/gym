@@ -945,6 +945,7 @@
   }
 
   window.GymUI = {
+    formatTimer,
     renderApp,
   };
 })();
