@@ -28,7 +28,7 @@
     return `
       <div class="app-shell">
         <main class="page">${renderCurrentTab(state)}</main>
-        ${state.currentTab === "routine" ? renderFab() : ""}
+        ${state.currentTab === "routine" ? renderFab(state) : ""}
         ${renderBottomNav(state.currentTab)}
         ${renderModal(state)}
       </div>
@@ -605,7 +605,20 @@
     `;
   }
 
-  function renderFab() {
+  function renderFab(state) {
+    const restTimer = state.restTimer || {};
+    const hasActiveTimer =
+      restTimer.duration > 0 && (restTimer.running || restTimer.completed || Number(restTimer.remaining) > 0);
+
+    if (hasActiveTimer) {
+      const label = formatTimer(restTimer.remaining);
+      return `
+        <button class="fab is-timer-active ${restTimer.completed ? "is-timer-complete" : ""}" data-action="stop-rest-timer" aria-label="Parar temporizador ${label}">
+          <span class="fab-countdown">${label}</span>
+        </button>
+      `;
+    }
+
     return `<button class="fab" data-action="open-quick-create">+ Anadir</button>`;
   }
 

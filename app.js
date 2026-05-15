@@ -30,6 +30,7 @@
   const DEFAULT_REST_TIMERS = [30, 60, 90, 120];
   const TIMER_FLASH_COUNT = 60;
   const TIMER_FLASH_DURATION_MS = 360;
+  const TIMER_SOUND_VOLUME = 0.55;
   const TIMER_SOUND_REPEAT_DELAY_MS = 100;
   const TIMER_SOUND_SOURCES = [
     "./assets/sounds/timer-complete.mp3",
@@ -61,6 +62,7 @@
     restTimerPressTimer: null,
     restTimerPressTarget: null,
     suppressTimerClickUntil: 0,
+    suppressSpotifyClickUntil: 0,
     timerFlashTimeout: null,
     suppressClickUntil: 0,
     modalHistoryActive: false,
@@ -87,6 +89,11 @@
   let timerSoundPlayCount = 0;
   let timerSoundRunId = 0;
   let timerSoundDelayTimeout = null;
+  let timerAudioContext = null;
+  let timerAlarmBuffer = null;
+  let timerScheduledSource = null;
+  let timerScheduledGain = null;
+  let timerScheduledRunId = 0;
 
   if (!window.history.state?.gymApp) {
     window.history.replaceState({ gymApp: true }, "", window.location.href);
@@ -209,6 +216,11 @@
   }
 
   function openSpotifyPlaylist() {
+    if (isTimerAlarmActive()) {
+      stopExpiredRestTimerAlarm();
+      return;
+    }
+
     let didLeavePage = false;
     const cancelFallback = () => {
       didLeavePage = true;
@@ -441,6 +453,7 @@
       running: true,
       completed: false,
     };
+    prepareScheduledTimerAlarm();
     ensureRestTimerInterval();
     render();
   }
@@ -489,6 +502,14 @@
     render();
   }
 
+  function updateRestTimerFromLifecycle() {
+    if (!state.restTimer.running) {
+      return;
+    }
+
+    updateRestTimer();
+  }
+
   function triggerRestTimerComplete() {
     stopTimerFlash({ render: false, resetCompleted: false });
     document.body.classList.remove("timer-complete-flash");
@@ -525,11 +546,11 @@
     audio.volume = 0;
     const promise = audio.play();
     if (!promise) {
-      timerSoundPrimed = true;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.muted = false;
-      audio.volume = 1;
+        timerSoundPrimed = true;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+        audio.volume = TIMER_SOUND_VOLUME;
       return;
     }
 
@@ -539,18 +560,123 @@
         audio.pause();
         audio.currentTime = 0;
         audio.muted = false;
-        audio.volume = 1;
+        audio.volume = TIMER_SOUND_VOLUME;
       })
       .catch(() => {
         audio.muted = false;
-        audio.volume = 1;
+        audio.volume = TIMER_SOUND_VOLUME;
       });
+  }
+
+  function getTimerAudioContext() {
+    if (timerAudioContext) {
+      return timerAudioContext;
+    }
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) {
+      return null;
+    }
+
+    timerAudioContext = new AudioContextClass();
+    return timerAudioContext;
+  }
+
+  async function loadTimerAlarmBuffer(audioContext) {
+    if (timerAlarmBuffer) {
+      return timerAlarmBuffer;
+    }
+
+    for (const src of TIMER_SOUND_SOURCES) {
+      try {
+        const response = await fetch(src);
+        if (!response.ok) {
+          continue;
+        }
+        const audioData = await response.arrayBuffer();
+        timerAlarmBuffer = await audioContext.decodeAudioData(audioData);
+        return timerAlarmBuffer;
+      } catch (error) {
+        // Try the next supported source format.
+      }
+    }
+
+    return null;
+  }
+
+  function prepareScheduledTimerAlarm() {
+    stopScheduledTimerAlarm();
+    const audioContext = getTimerAudioContext();
+    if (!audioContext || !state.restTimer.running || !state.restTimer.endsAt) {
+      return;
+    }
+
+    const runId = ++timerScheduledRunId;
+    const timerEndsAt = state.restTimer.endsAt;
+    const resumePromise = audioContext.state === "suspended" ? audioContext.resume() : Promise.resolve();
+
+    resumePromise
+      .then(() => loadTimerAlarmBuffer(audioContext))
+      .then((buffer) => {
+        if (
+          !buffer ||
+          runId !== timerScheduledRunId ||
+          !state.restTimer.running ||
+          state.restTimer.endsAt !== timerEndsAt
+        ) {
+          return;
+        }
+
+        const delaySeconds = Math.max(0, (timerEndsAt - Date.now()) / 1000);
+        const source = audioContext.createBufferSource();
+        const gain = audioContext.createGain();
+        source.buffer = buffer;
+        source.loop = true;
+        gain.gain.value = TIMER_SOUND_VOLUME;
+        source.connect(gain);
+        gain.connect(audioContext.destination);
+        source.onended = () => {
+          if (timerScheduledSource === source) {
+            timerScheduledSource = null;
+            timerScheduledGain = null;
+          }
+        };
+        timerScheduledSource = source;
+        timerScheduledGain = gain;
+        source.start(audioContext.currentTime + delaySeconds);
+      })
+      .catch(() => {
+        // The regular HTML audio fallback still runs when the timer completes.
+      });
+  }
+
+  function stopScheduledTimerAlarm() {
+    timerScheduledRunId += 1;
+    const source = timerScheduledSource;
+    timerScheduledSource = null;
+    timerScheduledGain = null;
+    if (!source) {
+      return;
+    }
+
+    source.onended = null;
+    try {
+      source.stop();
+    } catch (error) {
+      // Already stopped or not started yet.
+    }
   }
 
   function playTimerCompleteSound() {
     timerSoundRunId += 1;
     timerSoundPlayCount = 0;
     timerSoundActive = true;
+    if (timerScheduledSource) {
+      if (!timerAudioContext || timerAudioContext.state === "running") {
+        return;
+      }
+      stopScheduledTimerAlarm();
+    }
     playTimerSoundCycle(timerSoundRunId);
   }
 
@@ -576,7 +702,7 @@
     audio.pause();
     audio.currentTime = 0;
     audio.muted = false;
-    audio.volume = 1;
+    audio.volume = TIMER_SOUND_VOLUME;
     timerSoundPlayCount += 1;
     const promise = audio.play();
     if (promise) {
@@ -590,6 +716,7 @@
     timerSoundActive = false;
     timerSoundRunId += 1;
     timerSoundPlayCount = 0;
+    stopScheduledTimerAlarm();
     if (timerSoundDelayTimeout) {
       window.clearTimeout(timerSoundDelayTimeout);
       timerSoundDelayTimeout = null;
@@ -613,6 +740,25 @@
       audio.removeChild(audio.firstChild);
     }
     audio.load();
+  }
+
+  function isTimerAlarmActive() {
+    return (
+      timerSoundActive ||
+      state.restTimer.completed ||
+      (state.restTimer.running && state.restTimer.endsAt > 0 && Date.now() >= state.restTimer.endsAt)
+    );
+  }
+
+  function stopExpiredRestTimerAlarm() {
+    if (state.restTimer.running && state.restTimer.endsAt > 0 && Date.now() >= state.restTimer.endsAt) {
+      state.restTimer.running = false;
+      state.restTimer.completed = true;
+      state.restTimer.remaining = 0;
+      clearRestTimerInterval();
+    }
+
+    stopTimerFlash();
   }
 
   function stopTimerFlash(options = {}) {
@@ -752,6 +898,10 @@
         }
         startRestTimer(actionEl.dataset.seconds);
         break;
+      case "stop-rest-timer":
+        event.stopPropagation();
+        stopRestTimer();
+        break;
       case "open-quick-create":
         state.openGroupMenuId = null;
         openModal({ type: "quick-create" });
@@ -801,9 +951,15 @@
         });
         break;
       case "open-spotify-playlist":
-        event.preventDefault();
-        event.stopPropagation();
-        openSpotifyPlaylist();
+        if (Date.now() < state.suppressSpotifyClickUntil || isTimerAlarmActive()) {
+          event.preventDefault();
+          event.stopPropagation();
+          stopExpiredRestTimerAlarm();
+        } else if (actionEl.tagName.toLowerCase() !== "a") {
+          event.preventDefault();
+          event.stopPropagation();
+          openSpotifyPlaylist();
+        }
         break;
       case "delete-exercise":
         if (confirmAction("Se eliminara el ejercicio y todo su historial. Quieres continuar?")) {
@@ -960,7 +1116,15 @@
 
   document.addEventListener("pointerdown", (event) => {
     if (!event.target.closest(".rest-timer-button[data-action='start-rest-timer']")) {
-      stopTimerFlash();
+      const hadActiveAlarm = isTimerAlarmActive();
+      if (hadActiveAlarm) {
+        stopExpiredRestTimerAlarm();
+        if (event.target.closest("[data-action='open-spotify-playlist']")) {
+          state.suppressSpotifyClickUntil = Date.now() + 900;
+        }
+      } else {
+        stopTimerFlash();
+      }
     }
 
     const timerButton = event.target.closest(".rest-timer-button[data-action='start-rest-timer']");
@@ -1527,6 +1691,13 @@
       navigator.serviceWorker.register("./sw.js").catch(() => {});
     });
   }
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      updateRestTimerFromLifecycle();
+    }
+  });
+  window.addEventListener("focus", updateRestTimerFromLifecycle);
 
   render();
 })();

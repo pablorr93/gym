@@ -41,16 +41,17 @@ Cambios ya aplicados durante la sesion:
 - La configuracion de nube se guarda en `localStorage` con la clave `gym_github_cloud_v1` e incluye usuario/organizacion, repositorio, rama, carpeta y token.
 - El archivo remoto de copia se llama `gym-progress-cloud.json` y se guarda dentro de la carpeta configurada del repositorio.
 - La subida/carga real a GitHub requiere un token introducido por el usuario con permisos de contenido del repositorio. No se probo con GitHub real porque no se proporciono token/repositorio.
+- Cuando hay un temporizador activo o completado, el boton flotante deja de mostrar `+ Anadir`, se expande con una animacion y muestra la cuenta atras grande hasta `00:00`; al tocarlo se para el temporizador y vuelve a `+ Anadir`.
 
 Estado de versiones/cache al ultimo cambio:
 
 - `index.html`
-  - `styles.css?v=69`
+  - `styles.css?v=70`
   - `data.js?v=34`
-  - `ui.js?v=65`
-  - `app.js?v=56`
+  - `ui.js?v=68`
+  - `app.js?v=59`
 - `sw.js`
-  - `CACHE_NAME = "gym-progress-v82"`
+  - `CACHE_NAME = "gym-progress-v85"`
   - cachea los mismos assets versionados.
 
 Importante: si se cambia CSS o JS, actualizar tambien los parametros `?v=` en `index.html` y las entradas de `APP_SHELL` en `sw.js`, y subir `CACHE_NAME`. La cache del service worker fue una fuente real de confusion: a veces el navegador seguia mostrando codigo antiguo aunque los archivos estuvieran editados.
@@ -114,10 +115,11 @@ Tras cambios en JS/CSS:
 
 - Mantener estetica oscura con verde neon y acentos amarillos/naranja donde ya existan.
 - Mantener la cabecera con imagen PRR como primer impacto visual.
-- La imagen PRR de cabecera en `Rutina` intenta abrir directamente la playlist en la app de Spotify con `spotify:playlist:0Cs4HkwhV0jmmDBpnVYjJK` y usa como fallback el enlace web `https://open.spotify.com/playlist/0Cs4HkwhV0jmmDBpnVYjJK?si=f13c0fa115ea4cdb`.
+- La imagen PRR de cabecera en `Rutina` intenta abrir directamente la playlist en la app de Spotify con `spotify:playlist:0Cs4HkwhV0jmmDBpnVYjJK` y usa como fallback el enlace web `https://open.spotify.com/playlist/0Cs4HkwhV0jmmDBpnVYjJK?si=f13c0fa115ea4cdb`. Si la alarma del temporizador esta sonando, tocar la imagen debe parar la alarma y el parpadeo sin abrir Spotify.
 - Mantener tarjetas oscuras de bordes redondeados y efecto cristal.
 - Mantener la navegacion inferior fija con `Rutina`, `Progreso`, `Ajustes`.
 - Mantener el boton flotante `+ Anadir`.
+- Al activar un temporizador, el boton flotante se agranda y muestra la cuenta atras con numeros grandes. Mientras este corriendo o terminado en `00:00`, tocar el flotante para el temporizador y restaura `+ Anadir`.
 - Mantener el modo tunel para subgrupos anidados. El usuario lo prefiere porque visualmente deja claro que un subgrupo esta dentro de otro.
 - No convertir subgrupos anidados en lista plana.
 - Los subgrupos deben conservar un espaciado visual equilibrado dentro del grupo padre, sin que el lado izquierdo quede mas apretado que el derecho.
@@ -138,6 +140,8 @@ Tras cambios en JS/CSS:
 - Al pulsar un temporizador empieza a contar directamente; si se vuelve a pulsar mientras cuenta, se para y vuelve a mostrar su tiempo normal.
 - Al llegar a `00:00`, el temporizador se queda mostrando `00:00`, la pantalla parpadea 60 veces y suena el audio de `assets/sounds/` en bucle mientras dure el parpadeo. El parpadeo y el sonido se cortan antes si el usuario pulsa la pantalla, y el temporizador vuelve a mostrar su tiempo original.
 - Al parar la alarma del temporizador, el audio debe liberarse por completo para que la musica del movil vuelva a su volumen normal.
+- La alarma del temporizador usa volumen reducido y programa el sonido con Web Audio al iniciar el temporizador para mejorar que suene tambien con temporizadores largos cuando la app queda en segundo plano. Mantener fallback HTML audio para navegadores que no soporten esa programacion.
+- `sw.js` cachea `assets/sounds/timer-complete.mp3` para que el sonido de alarma este disponible en la PWA al usar temporizadores largos.
 - Al mantener pulsado un temporizador, se abre la edicion de ese temporizador; si estaba contando, primero se para. Los cuatro valores editados se guardan en `localStorage` con la clave `gym_rest_timer_slots_v1`.
 - La tarjeta superior de temporizadores no debe mostrar las cajas de metricas `Listos para subir` ni `Bloques musculares`.
 - En `Progreso`, la tarjeta `Progreso por ejercicio` muestra registros por ejercicio con grupo/subgrupo, barra con la misma logica porcentual que las barras de ejercicios y filas clicables.
@@ -170,10 +174,9 @@ Tras cambios en JS/CSS:
 
 ## Ultima verificacion conocida
 
-Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=cloud-scroll-v50`:
+Se verifico en el navegador interno con `http://127.0.0.1:8000/?fresh=fab-timer-v2`:
 
-- Aparece la tarjeta `Datos en la nube` en `Ajustes`.
-- Abre correctamente el modal `Carpeta de GitHub` con usuario/organizacion, repositorio, rama, carpeta y token.
-- Al desplazarse en `Ajustes`, cambiar a otra pestana y volver, se conserva la posicion.
-- En `Progreso`, al cambiar a `Ajustes` y volver, se conserva el punto de la pagina y los scrolls internos.
+- Al activar un temporizador, el flotante cambia de `+ Anadir` a la cuenta atras y usa la clase visual expandida.
+- Al llegar a `00:00`, el flotante se queda mostrando `00:00` con estado completado.
+- Al tocar el flotante completado, se para el temporizador y vuelve a `+ Anadir`.
 - Los archivos `data.js`, `ui.js` y `app.js` pasaron `node --check`.
