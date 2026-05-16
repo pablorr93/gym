@@ -1,32 +1,32 @@
 {
   "app": "gym-progress-web",
   "version": 1,
-  "exportedAt": "2026-05-15T14:51:37.206Z",
+  "exportedAt": "2026-05-16T12:47:44.929Z",
   "storage": {
     "groups": [
       {
         "id": "g_pecho",
         "name": "Pecho",
-        "order": 1,
+        "order": 0,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-10T18:35:59.952Z"
+        "updatedAt": "2026-05-15T16:59:07.924Z"
       },
       {
         "id": "g_brazos",
         "name": "Brazos",
-        "order": 0,
+        "order": 1,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-13T11:02:33.088Z"
+        "updatedAt": "2026-05-15T15:52:52.921Z"
       },
       {
         "id": "g_biceps",
         "name": "Biceps",
         "order": 0,
         "parentId": "g_brazos",
-        "isExpanded": true,
-        "updatedAt": "2026-05-13T11:02:25.361Z"
+        "isExpanded": false,
+        "updatedAt": "2026-05-15T16:18:11.151Z"
       },
       {
         "id": "g_triceps",
@@ -34,7 +34,7 @@
         "order": 1,
         "parentId": "g_brazos",
         "isExpanded": false,
-        "updatedAt": "2026-05-10T17:53:35.410Z"
+        "updatedAt": "2026-05-15T16:18:19.180Z"
       },
       {
         "id": "g_hombros",
@@ -55,15 +55,15 @@
       {
         "id": "g_correccion",
         "name": "Corregir encorv",
-        "order": 4,
+        "order": 6,
         "parentId": null,
         "isExpanded": false,
-        "updatedAt": "2026-05-10T18:37:44.017Z"
+        "updatedAt": "2026-05-15T15:52:20.735Z"
       },
       {
         "id": "g_espalda_root",
         "name": "Espalda",
-        "order": 5,
+        "order": 4,
         "parentId": null,
         "isExpanded": false,
         "updatedAt": "2026-05-10T17:33:51.285Z"
@@ -85,7 +85,7 @@
       {
         "id": "g_inferior",
         "name": "Inferior",
-        "order": 6,
+        "order": 5,
         "parentId": null,
         "isExpanded": false
       },
@@ -109,10 +109,10 @@
         "id": "e_pecho_mancuernas",
         "groupId": "g_pecho",
         "name": "Pecho Mancuernas",
-        "currentKg": 18,
-        "nextKg": 20,
+        "currentKg": 20,
+        "nextKg": 22,
         "order": 0,
-        "updatedAt": "2026-05-13T11:52:52.300Z",
+        "updatedAt": "2026-05-16T10:55:25.500Z",
         "notes": "",
         "readyToIncrease": false,
         "isSeparated": false,
@@ -148,12 +148,12 @@
         "id": "e_biceps_barra",
         "groupId": "g_biceps",
         "name": "Biceps Barra",
-        "currentKg": 10,
-        "nextKg": 15,
+        "currentKg": 15,
+        "nextKg": 20,
         "order": 0,
-        "updatedAt": "2026-05-10T19:38:25.102Z",
+        "updatedAt": "2026-05-16T11:15:10.933Z",
         "notes": "",
-        "readyToIncrease": true,
+        "readyToIncrease": false,
         "isSeparated": false,
         "initialKg": 10
       },
@@ -177,9 +177,9 @@
         "currentKg": 15,
         "nextKg": 17.5,
         "order": 2,
-        "updatedAt": "2026-05-13T11:12:23.397Z",
+        "updatedAt": "2026-05-16T11:14:57.154Z",
         "notes": "2 pasos adelante, 1 hacía el bíceps a trabajar, flexión hacía el exterior con codo pegado. Poleas altura de las muñecas",
-        "readyToIncrease": true,
+        "readyToIncrease": false,
         "isSeparated": false,
         "initialKg": 12.5
       },
@@ -190,7 +190,7 @@
         "currentKg": 25,
         "nextKg": 30,
         "order": 1,
-        "updatedAt": "2026-05-09T20:39:49.642Z",
+        "updatedAt": "2026-05-16T11:34:02.183Z",
         "notes": "",
         "readyToIncrease": false,
         "isSeparated": false,
@@ -228,12 +228,12 @@
         "name": "Pecho Maquina",
         "notes": "",
         "initialKg": 25,
-        "currentKg": 35,
-        "nextKg": 40,
-        "readyToIncrease": true,
+        "currentKg": 40,
+        "nextKg": 45,
+        "readyToIncrease": false,
         "isSeparated": false,
         "order": 1,
-        "updatedAt": "2026-05-13T11:59:57.568Z"
+        "updatedAt": "2026-05-16T10:55:04.199Z"
       },
       {
         "id": "1778358293706-772006",
@@ -295,10 +295,10 @@
         "initialKg": 40,
         "currentKg": 45,
         "nextKg": 50,
-        "readyToIncrease": true,
+        "readyToIncrease": false,
         "isSeparated": false,
         "order": 0,
-        "updatedAt": "2026-05-10T19:38:44.896Z"
+        "updatedAt": "2026-05-16T11:43:40.175Z"
       },
       {
         "id": "1778359223372-854530",
@@ -348,9 +348,9 @@
         "currentKg": 50,
         "nextKg": 55,
         "readyToIncrease": false,
-        "isSeparated": true,
-        "order": 2,
-        "updatedAt": "2026-05-09T20:44:00.830Z"
+        "isSeparated": false,
+        "order": 3,
+        "updatedAt": "2026-05-16T11:26:42.845Z"
       },
       {
         "id": "1778359545166-804072",
@@ -358,12 +358,12 @@
         "name": "Hombro Mancuenas Frente Ladeado",
         "notes": "",
         "initialKg": 6,
-        "currentKg": 10,
-        "nextKg": 12,
+        "currentKg": 12,
+        "nextKg": 14,
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 0,
-        "updatedAt": "2026-05-13T12:16:55.688Z"
+        "updatedAt": "2026-05-16T12:10:45.899Z"
       },
       {
         "id": "1778359600299-576596",
@@ -384,12 +384,12 @@
         "name": "Poleas Lado Detrás 1 Cable",
         "notes": "",
         "initialKg": 5,
-        "currentKg": 10,
+        "currentKg": 12.5,
         "nextKg": 15,
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 2,
-        "updatedAt": "2026-05-09T20:47:16.416Z"
+        "updatedAt": "2026-05-16T12:29:21.203Z"
       },
       {
         "id": "1778359689013-378203",
@@ -398,11 +398,11 @@
         "notes": "",
         "initialKg": 5,
         "currentKg": 10,
-        "nextKg": 15,
+        "nextKg": 12.5,
         "readyToIncrease": false,
         "isSeparated": false,
         "order": 3,
-        "updatedAt": "2026-05-09T20:48:09.013Z"
+        "updatedAt": "2026-05-16T12:32:11.360Z"
       },
       {
         "id": "1778359733507-1897",
@@ -412,10 +412,10 @@
         "initialKg": 25,
         "currentKg": 30,
         "nextKg": 35,
-        "readyToIncrease": false,
+        "readyToIncrease": true,
         "isSeparated": false,
         "order": 4,
-        "updatedAt": "2026-05-10T19:39:16.853Z"
+        "updatedAt": "2026-05-16T12:40:37.812Z"
       },
       {
         "id": "1778359771025-270791",
@@ -817,6 +817,76 @@
         "toKg": 35,
         "createdAt": "2026-05-13T11:56:55.061Z",
         "note": "Subida aplicada"
+      },
+      {
+        "id": "1778928104453-159359",
+        "exerciseId": "e_pecho_mancuernas",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 18,
+        "toKg": 20,
+        "createdAt": "2026-05-16T10:41:44.450Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778928904199-462277",
+        "exerciseId": "1778358255471-1005875",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 35,
+        "toKg": 40,
+        "createdAt": "2026-05-16T10:55:04.199Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778929605812-951570",
+        "exerciseId": "e_biceps_barra",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 10,
+        "toKg": 15,
+        "createdAt": "2026-05-16T11:06:45.812Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778933445899-253526",
+        "exerciseId": "1778359545166-804072",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 10,
+        "toKg": 12,
+        "createdAt": "2026-05-16T12:10:45.899Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778934558578-437146",
+        "exerciseId": "1778359636416-675830",
+        "type": "manualEdit",
+        "metric": "nextKg",
+        "fromKg": 15,
+        "toKg": 12.5,
+        "createdAt": "2026-05-16T12:29:18.578Z",
+        "note": "Objetivo actualizado"
+      },
+      {
+        "id": "1778934561203-677610",
+        "exerciseId": "1778359636416-675830",
+        "type": "appliedNextWeight",
+        "metric": "currentKg",
+        "fromKg": 10,
+        "toKg": 12.5,
+        "createdAt": "2026-05-16T12:29:21.203Z",
+        "note": "Subida aplicada"
+      },
+      {
+        "id": "1778934731360-68877",
+        "exerciseId": "1778359689013-378203",
+        "type": "manualEdit",
+        "metric": "nextKg",
+        "fromKg": 15,
+        "toKg": 12.5,
+        "createdAt": "2026-05-16T12:32:11.360Z",
+        "note": "Objetivo actualizado"
       }
     ],
     "snapshot": {
@@ -826,8 +896,8 @@
   },
   "restTimers": [
     120,
-    2,
     60,
+    30,
     90
   ]
 }
